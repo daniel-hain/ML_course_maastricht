@@ -231,21 +231,30 @@ data %>%
 
 * We can obviously fit a linear model on it. 
 * What do the predicted values mean then? 
+* We could intrpet them as `probability: y=TRUE`
+* However, how does the model fit th data?
 
-```{r}
+```{r,echo=FALSE}
 data %>% ggplot(aes(x = x, y = y)) + 
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", formula = y ~ x, se = TRUE)
 ```
 
-```{r}
+--- 
+
+* I gues we would like more to have something like this below, right?
+* This seems to be more suited for class prediction, right?
+
+```{r,echo=FALSE}
 data %>% ggplot(aes(x = x, y = y)) + 
   geom_point(alpha = 0.5) +
   geom_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE) 
 ```
 
+---
 
-
+* How do we do that?
+* The easiest way is to use a `glm`, where we just change the distribution
 
 ```{r}
 fit_log <- data %>%
@@ -253,6 +262,10 @@ fit_log <- data %>%
 
 fit_log %>% summary
 ```
+
+---
+
+* based on this model we can now also carry out predictions
 
 ```{r}
 pred_log <- fit_log %>% predict(type = "response") 
