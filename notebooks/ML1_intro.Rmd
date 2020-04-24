@@ -370,3 +370,218 @@ roc_log %>% autoplot()
 ```
 
 # Generalization in ML models
+
+## Generalization via "Out-of-Sample-Testing" {.smaller}
+
+With so much freedom wrt. feature selection, functional form ect., models are prone to over-fitting. And no constraints by asymptotic properties, causality and so forth, how can we generalize anything?
+
+In ML, generalization is not achived by statistical derivatives and theoretical argumentation, but rather by answering the practical question: **How well would my model perform with new data?** To answer this question, **Out-of-Sample-Testing** is usually taken as solution. Here, you do the following
+
+1. Split the dataset in a training and a test sample.
+2. Fit you regression (train your model) on one dataset
+     * Optimal: Tune hyperparameters by minimizing loss in a validation set. 
+     * Optimal: Retrain final model configuration on whole training set
+3. Finally, evaluate predictive power on test sample, on which model is not fitted.
+			
+An advanced version is a **N-fold-Crossvalidation**, where this process is repeated several time during the **hyperparameter-tuning** phase (more on that later).
+
+---
+
+![](https://www.dropbox.com/s/mckm524jdserm2x/cv_steps.png?dl=1){width=700px}
+
+## Bias-Variance Tradeoff
+
+![](https://www.dropbox.com/s/66o5gvtaeh6n5ut/learningmodels.png?dl=1){width=500px}
+
+* As a rule-of-thumb: Richer and more complex functional forms and algorithms tend to be better in predictign complex real world pattern. This is particularly true for high-dimensional (big) data.
+* However, flexible algorithms at one point become so good in mimicing the pattern in our data that they **overfit**, meaning are to much tuned towards a specific dataset and might not reproduce the same accuracy in new data. 
+
+## Bias-Variance Tradeoff {.smaller}
+
+Generally, we call this tension the **bias-variance tradeoff**, which we can decompose in the two components:
+
+1. **Bias Error** The simplifying assumptions made by a model to make the target function easier to learn. Generally, simple parametric algorithms have a high bias making them fast to learn and easier to understand but generally less flexible. 
+2. **Variance Error:** Variance is the amount that the estimate of the target function will change if different data was used. Ideally, it should not change too much from one training dataset to the next, meaning that the algorithm is good at picking out the hidden underlying mapping between the inputs and the output variables. 
+
+$${\displaystyle \operatorname {E} {\Big [}{\big (}y-{\hat {f}}(x){\big )}^{2}{\Big ]}={\Big (}\operatorname {Bias} {\big [}{\hat {f}}(x){\big ]}{\Big )}^{2}+\operatorname {Var} {\big [}{\hat {f}}(x){\big ]}+\sigma ^{2}}$$
+
+* As a result, the predictive performance (on new data) of algorithms and models will always depend on this trade-off between bias and variance. Mathematically, this can be formalized as:
+* Note that why bias and variance are reducible errors which decline when using a more suitable model to model the underlying relationships in the data, $\sigma^2$ denotes the unreducible complexity caused by random noise, measurement errors, or missing variables, which represent a boundary to our ability to predict given the data at hand.
+
+## Example {.smaller}
+
+* We create some data, where $x$ is a uniformly distributed random variable bounded between 0-1, and $y = sin(n)$ 
+
+```{r}
+data <- tibble(x = runif(50, min = 0, max = 3.14),
+               y = sin(x) )
+```
+
+```{r,echo=FALSE}
+data %>% ggplot(aes(x = x, y = y)) + 
+  geom_point()
+```
+
+---
+
+How, we add some random noise, which is normally distributed
+
+```{r}
+error <- rnorm(n = 50, mean = 0, sd = 0.05)
+data %<>% mutate(y_e = y + error)
+```
+
+```{r,echo=FALSE}
+data %>% ggplot(aes(x = x, y = y_e)) + 
+  geom_point()
+```
+
+## Fitting different models 
+
+We see the formerly clearly visible underlying relationship between $x$ and $y$ now to some extent disturbed by this noise. However, keep in mind that the process that generated the data is still $y = sinus(x)$, which would also be the best funtional form to identify by any predictive algorithm.
+
+Lets see how models with different levels of complexity would interpret the reælationship between $x$ and $y$:
+
+
+---
+
+  2. $y$ is modeled as a linear function of $x$
+  3. $y$ is modeled as a curvelinear function of $x$
+  3. $y$ is modeled as a compex multinomial function of $x$
+
+```{r,echo=FALSE}
+data %>% ggplot(aes(x = x, y = y_e)) + 
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x, 
+              se = FALSE, aes(colour = "linear"), linetype = "dashed")  +
+  geom_smooth(method = "lm", formula = y ~ x + poly(x, 2), 
+              se = FALSE, aes(colour = "curvelinear"), linetype = "dotted") +
+  geom_smooth(method = "lm", formula = y ~ x + poly(x, 20), 
+              se = FALSE, aes(colour = "polynomial"), linetype = "longdash")      
+```
+
+In this case, we clearly se that a linear model is too simple, therefore introduces a lot of bias. The curvelinear model indead approximates the underlying relationship correct, while the curvelinear model indeed presents a better fit to the data at hand but misses the underlying relationship. It most likely would perform worse on new data subject to the same random variation.
+
+---
+
+![](https://www.dropbox.com/s/yai8hbcvbo3haoq/ml_bias_variance1.jpg?dl=1){width=750px}
+
+## Regularization {.smaller}
+
+!https://www.dropbox.com/s/3svghvjeukabrwp/ml_complexity_error.png?dl=1[](){width=500px}
+
+*  The process of minimizing bias and variance errors is called **regularization** (inpractice also refered to as **hyperparameter-tuning**)
+* We aim at selecting the right model class, functional form, and degree of complexity to jointly minimize in-sample loss but also between-sample variations.
+
+
+---
+
+Mathematically speaking, we try to minimize a loss function $L(.)$ (eg. RMSE) the following problem:
+
+$$minimize \underbrace{\sum_{i=1}^{n}L(f(x_i),y_i),}_{in-sample~loss} ~ over \overbrace{~ f \in F ~}^{function~class} subject~to \underbrace{~ R(f) \leq c.}_{complexity~restriction}$$
+
+## Hyperparameter Tuning
+
+* Most model classes have parameters influencing their functionality
+* These parameters often influence predictive performance of models
+* Finding the right hyperparameter configuration (tuning) is therefore an essiential part when engineering predictive algorithms
+
+---
+
+![](https://www.dropbox.com/s/atva3mgrn3kpy8r/ml_hyperparam1.png?dl=1){width=750px}
+
+---
+
+![](https://www.dropbox.com/s/dogot9mi70y5ueq/ml_hyperparam2.png?dl=1){width=750px}
+
+---
+
+![](https://www.dropbox.com/s/z5v50gsef2vfpwm/ml_hyperparam3.png?dl=1){width=750px}
+
+
+# Examples of Model classes
+
+## Elastic Net
+The elastic net has the functional form of a generalized linear model, plus an adittional term $\lambda$ a parameter which penalizes the coefficient by its contribution to the models loss in the form of:
+
+$$\lambda \sum_{p=1}^{P} [ 1 - \alpha |\beta_p| + \alpha |\beta_p|^2]$$
+
+* Here, we have 2 tunable parameters, $\lambda$ and $\alpha$.  If $\alpha = 0$, we are left with $|\beta_i|$, turning it to a lately among econometricians very popular **Least Absolute Shrinkage and Selection Operator** (LASSO) regression. 
+* Obviously, when $\lambda = 0$, the whole term vanishes, and we are again left with a generalized linear model. 
+
+
+## Decision Trees
+
+What this interesting family of models is about:
+
+* Mostly used in classification problems on continuous or categorical variables.
+* Idea: split the population or sample into two or more homogeneous sets (or sub-populations) based on most significant splitter / differentiator in input variables.
+* Repeat till stop criterium reachesd. leads to a tree-like structure.
+
+![](https://www.dropbox.com/s/rhdx8upcikkun7p/regtree0.png?dl=1){width=500px}
+
+--- 
+
+This class became increasingly popular in business and other applications. Some reasons are:
+
+* Easy to Understand: Decision tree output is very easy to understand even for people from non-analytical background.
+* Useful in Data exploration: Decision tree is one of the fastest way to identify most significant variables and relation between two or more variables.
+* Data type is not a constraint: It can handle both numerical and categorical variables.
+* Non Parametric Method: Decision tree is considered to be a non-parametric method. This means that decision trees have no assumptions about the space distribution and the classifier structure.
+
+## Some tree terminology {.smaller}
+
+* **Root Node:** Entire population or sample and this further gets divided into two or more homogeneous sets.
+* **Splitting:** It is a process of dividing a node into two or more sub-nodes.
+* **Decision Node:** When a sub-node splits into further sub-nodes, then it is called decision node.
+* **Leaf/ Terminal Node:** Nodes do not split is called Leaf or Terminal node.
+
+![](https://www.dropbox.com/s/j5ise9gi226rsnn/regtree2.png?dl=1){width=500px}
+
+---
+
+The decision of making strategic splits heavily affects a tree's accuracy. So, How does the tree decide to split? This is different across the large family of tree-like models. Common approaches:
+
+* Gini Index
+* $\chi^2$ 
+* Reduction in $\sigma^2$
+
+Some common complexity restrictions are:
+
+* Minimum samples for a node split
+* Minimum samples for a terminal node (leaf)
+* Maximum depth of tree (vertical depth)
+* Maximum number of terminal nodes
+* Maximum features to consider for split	
+
+---
+
+Likewise, there are a veriety of tunable hyperparameters across different applications of this model family.
+
+![](https://www.dropbox.com/s/dwl89havzpl1qla/regtree3.png?dl=1){width=750px}
+
+## Random Forest
+
+* As a continuation of tree-based classification methods, random forests aim at reducing overfitting by introducing randomness via bootstrapping, boosting, and ensemble techniques. 
+* It is a type of ensemble learning method, where a group of weak models combine to form a powerful model. 
+* The idea here is to create an "ensemble of classification trees"", all grown out of a different bootstrap sample. Having grown a forest of trees, every tree performs a prediction, and the final model prediction is formed by a majority vote of all trees. 
+* This idea close to Monte Carlo simulation approaches, tapping in the power of randomness.
+
+--- 
+
+![](https://www.dropbox.com/s/f0a2afec92awyw0/rf2.png?dl=1){width=750px}
+
+# Summing up
+
+## What we covered so far
+
+In this session, took a look at 
+
+* What is ML to start with?
+* The difference between traditional inferential statistics and ML
+* Out-of-Sample validation
+* The Bias-Variance Tradeoff
+* How to tune ML models
+* ML model classes
+
+In the next session, we will apply what we learned so far... so stay tuned!
