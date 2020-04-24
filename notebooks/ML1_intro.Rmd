@@ -48,7 +48,8 @@ As with any concept, machine learning may have a slightly different definition, 
 * "Machine learning algorithms can figure out how to perform important tasks by generalizing from examples." - University of Washington
 * "The field of Machine Learning seeks to answer the question "How can we build computer systems that automatically improve with experience, and what are the fundamental laws that govern all learning processes?" - Carnegie Mellon University
 
-## Supervised vs. Unsupervised ML
+## Supervised vs. Unsupervised ML {.smaller}
+
 ### Unsupervised ML
 
 Tasks related to pattern recognition and data exploration, in dase there yet does not exist a right answer or problem structure. Main application
@@ -75,7 +76,7 @@ This is what is currently driving >90% ML applications in research, industry, an
 
 # Contrasting ML with inferential statistics
 
-## Inferential Statistics
+## Inferential Statistics {.smaller}
 * Mostly interested in producing good **parameter estimates**: Construct models with unbiased estimates of $\beta$, capturing the relationship  $x$ and $y$.
 * Supposedly \enquote{structural} models: Causal effect of directionality $x \rightarrow y$, robust across a variety of observed as well as up to now unobserved settings.
 * How: Carefully draw from  theories and empirical findings, apply logical reasoning to formulate hypotheses.
@@ -83,7 +84,7 @@ This is what is currently driving >90% ML applications in research, industry, an
 * Main concern: Minimize standard errors $\epsilon$ of $\beta$ estimates.
 * Not overly concerned with overall predictive power (eg. $R^2$) of those models, but about various type of endogeneity issues, leading us to develop sophisticated **identification strategies**
 
-## ML Approach
+## ML Approach {.smaller}
 * To large extend driven by the needs of the private sector $\rightarrow$ data analysis is gear towards producing good **predictions** of outcomes $\rightarrow$ fits for $\hat{y}$, not $\hat{\beta}$
      * Recommender systems: Amazon, Netflix, Sportify ect.
      * Risk scores}: Eg.g likelihood that a particular person has an accident, turns sick, or defaults on their credit.
@@ -131,7 +132,8 @@ We do so by minimizing the sum of (squared) errors between our prediction-line a
 
 ## Regression Example
 
-Let' do a brief example for a simple linear model. We generate some data, where $y$ is a linear function of $x$ plus some random error.
+* Let' do a brief example for a simple linear model. 
+* We generate some data, where $y$ is a linear function of $x$ plus some random error.
 
 ```{r}
 data <- tibble(x = runif(500, min = 0, max = 100), 
@@ -205,7 +207,7 @@ error %>% as_tibble() %>%
 
 ## Introduction to classification problems
 
-* Lets assume our outcome of interest is cateegorigal (Yes/No, Class1/Class2/Class3...)
+* Lets assume our outcome of interest is categorigal (Yes/No, Class1/Class2/Class3...)
 * 
 
 
@@ -232,7 +234,7 @@ data %>%
 * We can obviously fit a linear model on it. 
 * What do the predicted values mean then? 
 * We could intrpet them as `probability: y=TRUE`
-* However, how does the model fit th data?
+* However, how does the model fit the data?
 
 ```{r,echo=FALSE}
 data %>% ggplot(aes(x = x, y = y)) + 
@@ -274,3 +276,95 @@ pred_log %>% head()
 
 
 
+## Model assesments and metrics for classification problems {.smaller}
+
+![](https://www.dropbox.com/s/dn1juxbdfm8ryi8/cf1.jpg?dl=1){width=500px}
+
+* We remeber that the most commonly used performance measure for regression problems is the **RMSE**. 
+* However, how to we assess models aimed to solve classification problems? Here, it is not that straightforward, and we could (depending on the task) use different ones.
+* Most measures of predictive performance in classification tasks are derived from the confusion matrix.
+* The **Confusion Matrix** (in inferential statistics you would call it **Classification Table**, so don't get confused) is the main source 
+
+
+## Confussion Matrix Unpacked {.smaller}
+
+It is the 2x2 matrix with the foillowing cells:
+
+* **True Positive:** (TP)
+     * Interpretation: You predicted positive and it's true.
+     * You predicted that a woman is pregnant and she actually is.
+* **True Negative:** (TN)
+     * Interpretation: You predicted negative and it's true.
+     * You predicted that a man is not pregnant and he actually is not.
+* **False Positive:** (FP) - (Type 1 Error)
+     * Interpretation: You predicted positive and it's false.
+     * You predicted that a man is pregnant but he actually is not.
+* **False Negative:** (FN) - (Type 2 Error)
+     * Interpretation: You predicted negative and it's false.
+     * You predicted that a woman is not pregnant but she actually is.
+
+* Just remember, We describe predicted values as **Positive** and **Negative** and actual values as **True** and **False**. 
+* Out of combinations of these values, we dan derive a set of different quality measures.
+
+## Summary of Metrics {.smaller}
+
+**Accuracy** (ACC)
+$$ {ACC} ={\frac {\mathrm {TP} + \mathrm {TN} }{P+N}} $$
+
+**Sensitivity** also called recall, hit rate, or true positive rate (TPR)
+$$ {TPR} ={\frac {\mathrm {TP} }{P}}={\frac {\mathrm {TP} }{\mathrm {TP} +\mathrm {FN} }}$$
+
+**Specificity**, also called selectivity or true negative rate (TNR)
+$$ {TNR} ={\frac {\mathrm {TN} }{N}}={\frac {\mathrm {TN} }{\mathrm {TN} +\mathrm {FP} }}$$ 
+
+**Precision**, also called positive predictive value (PPV)
+$$ {PPV} ={\frac {\mathrm {TP} }{\mathrm {TP} +\mathrm {FP} }} $$ 
+
+**F1 score**: weighted average of the true positive rate (recall) and precision.
+$$ F_{1}={\frac {2\mathrm {TP} }{2\mathrm {TP} +\mathrm {FP} +\mathrm {FN} }} $$
+
+## Creating a confusion matrix
+
+* We can create it on our own
+* First, we create a tibble with the real and predicted values side-by-side
+
+```{r}
+res_log <- tibble(
+  y = data %>% pull(y) %>% as.factor(),
+  y_pred_prob = pred_log,
+  y_pred = pred_log %>% round(0) %>% as.factor(),)
+```
+
+* Then, we can create the confussion matrix
+
+```{r}
+cm_log <- res_log %>% conf_mat(y, y_pred)
+```
+
+---
+
+```{r}
+cm_log %>% autoplot(type = "heatmap")
+```
+
+---
+
+```{r}
+cm_log %>% summary()
+```
+
+## ROC and AUC
+* An ROC curve (receiver operating characteristic curve, weird name, i know. Comes originally from signal processing) is a derivative of the confusion matrix and predicted class-probabilities.
+* It tells us how sensitive our classification is to 
+* The area-under-the-curve (AUC) gies us another good indicator of a models predictive power
+
+```{r}
+roc_log <- res_log %>% roc_curve(y, y_pred_prob)
+roc_log %>% head()
+```
+
+---
+
+```{r}
+roc_log %>% autoplot()
+```

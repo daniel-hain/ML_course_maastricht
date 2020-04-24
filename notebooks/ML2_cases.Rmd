@@ -1,0 +1,669 @@
+---
+title: 'Machine Learning: Workflow and Applications'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+### Generic preamble
+rm(list=ls())
+Sys.setenv(LANG = "en") # For english language
+options(scipen = 5) # To deactivate annoying scientific number notation
+set.seed(1337) # To have a seed defined for reproducability
+
+### Knitr options
+library(knitr) # For display of the markdown
+knitr::opts_chunk$set(warning=FALSE,
+                     message=FALSE,
+                     fig.align="center"
+                     )
+
+### Install packages if necessary
+if (!require("pacman")) install.packages("pacman") # package for loading and checking packages :)
+```
+
+```{r}
+### Install and oad packages if necessary
+pacman::p_load(tidyverse, magrittr, 
+               tidymodels
+               )
+```
+
+Welcome all to this introduction to machine learning (ML). In this session we cover the following topics
+1. Generalizating and valididating from ML models.
+2. The Bias-Variance Trade-Off
+3. Out-of-sample testing and cross-validation workflows
+4. Implementing Ml workflows with the `tidymodels` ecosystem.
+
+# ML case 1 (Regression, tabular data): Boston Housing Prices
+
+## Data Description
+
+We will load a standard dataset from `mlbench`, the BostonHousing dataset. It comes as a dataframe with 506 observations on 14 features, the last one `medv` being the outcome:
+
+* `crim`	per capita crime rate by town
+* `zn`	proportion of residential land zoned for lots over 25,000 sq.ft
+* `indus`	proportion of non-retail business acres per town
+* `chas`	Charles River dummy variable (= 1 if tract bounds river; 0 otherwise) (deselected in this case)
+* `nox`	nitric oxides concentration (parts per 110 million)
+* `rm`	average number of rooms per dwelling
+* `age`	proportion of owner-occupied units built prior to 1940
+* `dis`	weighted distances to five Boston employment centres
+* `rad`	index of accessibility to radial highways
+* `tax`	full-value property-tax rate per USD 10,000
+* `ptratio`	pupil-teacher ratio by town
+* `b`	1000(B - 0.63)^2 where B is the proportion of blacks by town
+* `lstat`	lower status of the population
+* `medv`	median value of owner-occupied homes in USD 1000's (our outcome to predict)
+
+Source: Harrison, D. and Rubinfeld, D.L. "Hedonic prices and the demand for clean air", J. Environ. Economics & Management, vol.5, 81-102, 1978.
+
+These data have been taken from the [UCI Repository Of Machine Learning Databases](ftp://ftp.ics.uci.edu/pub/machine-learning-databases)
+
+```{r}
+library(mlbench) # Library including many ML benchmark datasets
+data(BostonHousing) 
+data <- BostonHousing %>% as_tibble() %>% select(-chas)
+rm(BostonHousing)
+```
+
+
+```{r}
+data %>%
+  glimpse()
+```
+
+
+In this exercise, we will predict `medv` (median value of owner-occupied homes in USD). Such a model would in teh real world be used to predict developments in housing prices, eg. to inform policy makers  or potential investors. In case I have only one target outcome, I prefer to name it as `y`. This simple naming convention helps to re-use code across datasets.
+
+```{r}
+data %<>%
+  rename(y = medv) %>%
+  select(y, everything()) 
+```
+
+## Data Inspecition and Visualization
+
+Lets take a look at some descriptives. Here, I like to use the `skimr` package, which does that bvery neath.
+
+```{r}
+data %>% skimr::skim()
+```
+
+Ok, time for some visual exploration. Here I will introduce the `GGally` package, a wrapper for `ggplot2` which has some functions for very nice visual summaries in matrix form.
+
+First, lets look at a classical correlation matrix.
+
+```{r,fig.width=7.5,fig.height=7.5,fig.align='center'}
+data %>%
+  GGally::ggcorr(label = TRUE, 
+                 label_size = 3, 
+                 label_round = 2, 
+                 label_alpha = TRUE)
+```
+
+Even cooler, the `ggpairs` function creates you a scatterplot matrix plus all variable distributions and correlations. 
+
+```{r,fig.width=10,fig.height=10,fig.align='center'}
+data %>%
+  GGally::ggpairs(aes(alpha = 0.3), 
+          ggtheme = theme_gray())  
+```
+
+
+## Data Preprocessing
+
+### Training & Test split
+
+First, we again split ou data in training and test sample. 
+
+```{r}
+data_split <- initial_split(data, prop = 0.75, strata = y)
+
+data_train <- data_split  %>%  training()
+data_test <- data_split %>% testing()
+```
+
+### Preprocessing recipe
+
+Here, we do only some simple transformations. 
+* We normalizizing all numeric data by centering (subtracting the mean) and scaling (divide by standard deviation). 
+* We remove features with near-zero-variance, which would not help the model a lot. 
+* We here also add a simple way to already in the preprocessing deal with missing data. `recipes` has inbuild missing value inputation algorithms, such as 'k-nearest-neighbors'.
+
+```{r}
+data_recipe <- data_train %>%
+  recipe(y ~.) %>%
+  step_center(all_numeric(), -all_outcomes()) %>% # Centers all numeric variables to mean = 0
+  step_scale(all_numeric(), -all_outcomes()) %>% # scales all numeric variables to sd = 1
+  step_nzv(all_predictors())  %>% # Removed predictors with zero variance
+  step_knnimpute(all_predictors()) %>% #  knn inputation of missing values
+  prep()
+```
+
+```{r}
+data_recipe
+```
+
+### Defining the models
+
+#### Linear Model (OLS)
+
+```{r}
+model_lm <- linear_reg(mode = 'regression') %>%
+  set_engine('lm') 
+```
+
+#### Elastic Net (Penalized Regression)
+
+```{r}
+model_el <-linear_reg(mode = 'regression', 
+                      penalty = tune(), 
+                      mixture = tune()) %>%
+  set_engine("glmnet")
+```
+
+#### Random Forest
+
+```{r}
+model_rf <- rand_forest(mode = 'regression',
+                        trees = 100,
+                        mtry = tune(),
+                        min_n = tune()
+                        ) %>%
+  set_engine('ranger', 
+             importance = 'impurity') 
+```
+
+#### Define workflow
+
+```{r}
+workflow_general <- workflow() %>%
+  add_recipe(data_recipe) 
+
+workflow_lm <- workflow_general %>%
+  add_model(model_lm)
+
+workflow_el <- workflow_general %>%
+  add_model(model_el)
+
+workflow_rf <- workflow_general %>%
+  add_model(model_rf)
+```
+
+### Hyperparameter Tuning
+
+#### Validation Sampling (Bootstrapping)
+
+This time, we will use a bootstrap sampling strategy, where we will draw a number of n randomly selected observations from the sample, and repeat this process 5 times. That means that our bootstrapped samples have the same size as the original one. This is a good resampling strategy in case the initial number of observations is low.
+
+```{r}
+data_resample <- bootstraps(data_train, 
+                            strata = y,
+                            times = 5)
+```
+
+```{r}
+data_resample %>% glimpse() 
+```
+
+#### Hyperparameter Tuning: Elastic Net
+
+```{r}
+tune_el <-
+  tune_grid(
+    workflow_el,
+    resamples = data_resample,
+    grid = 10
+  )
+```
+
+```{r}
+tune_el %>% autoplot()
+```
+
+```{r}
+best_param_el <- tune_el %>% select_best(metric = 'rmse')
+best_param_el
+```
+
+```{r}
+tune_el %>% show_best(metric = 'rmse', n = 1)
+```
+
+#### Hyperparameter Tuning: Random Forest
+
+```{r}
+tune_rf <-
+  tune_grid(
+    workflow_rf,
+    resamples = data_resample,
+    grid = 10
+  )
+```
+
+```{r}
+tune_rf %>% autoplot()
+```
+
+```{r}
+best_param_rf <- tune_rf %>% select_best(metric = 'rmse')
+best_param_rf
+```
+
+```{r}
+tune_rf %>% show_best(metric = 'rmse', n = 1)
+```
+
+
+
+#### Fit models with tuned hyperparameters
+
+Alright, now we can fit the final models. Therefore, we have to first upate the formerly created workflows, where we fill the `tune()` placeholders with the by now determined best performing hyperparameter setup.
+
+```{r}
+workflow_final_el <- workflow_el %>%
+  finalize_workflow(parameters = best_param_el)
+
+workflow_final_rf <- workflow_rf %>%
+  finalize_workflow(parameters = best_param_rf)
+```
+
+```{r}
+fit_lm <- workflow_lm %>%
+  fit(data_train)
+
+fit_el <- workflow_final_el %>%
+  fit(data_train)
+
+fit_rf <- workflow_final_rf %>%
+  fit(data_train)
+```
+
+#### Compare performance
+
+```{r}
+pred_collected <- tibble(
+  truth = data_train %>% pull(y),
+  base = mean(truth),
+  lm = fit_lm %>% predict(new_data = data_train) %>% pull(.pred),
+  el = fit_el %>% predict(new_data = data_train) %>% pull(.pred),
+  rf = fit_rf %>% predict(new_data = data_train) %>% pull(.pred),
+  ) %>% 
+  pivot_longer(cols = -truth,
+               names_to = 'model',
+               values_to = '.pred')
+```
+
+```{r}
+pred_collected %>% head()
+```
+
+
+```{r}
+pred_collected %>%
+  group_by(model) %>%
+  rmse(truth = truth, estimate = .pred) %>%
+  select(model, .estimate) %>%
+  arrange(.estimate)
+```
+
+```{r}
+pred_collected %>%
+  ggplot(aes(x = truth, y = .pred, color = model)) +
+  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_point(alpha = 0.5) +
+  labs(
+    x = "Truth",
+    y = "Predicted price",
+    color = "Type of model"
+  )
+```
+
+#### Final prediction
+
+So, now we are almost there. Since we know we will use the random forest, we only have to predict on our test sample and see how we fair...
+
+```{r}
+fit_last_rf <- workflow_final_rf %>% last_fit(split = data_split)
+```
+
+```{r}
+fit_last_rf %>% collect_metrics()
+```
+
+#### Variable importance
+
+```{r}
+fit_last_rf %>% 
+  pluck(".workflow", 1) %>%   
+  pull_workflow_fit() %>% 
+  vip::vip(num_features = 10)
+```
+
+
+```{r}
+fit_el %>%
+  pull_workflow_fit() %>%
+  vip::vip(num_features = 10)
+```
+
+
+# ML case 2 (Classification, tabular data): Telco Customer Churn
+
+```{r, include=FALSE}
+rm(list=ls()); graphics.off() # get rid of everything in the workspace
+```
+
+## Data Description
+
+Customer churn refers to the situation when a customer ends their relationship with a company, and it's a costly problem. Customers are the fuel that powers a business. Loss of customers impacts sales. Further, it's much more difficult and costly to gain new customers than it is to retain existing customers. As a result, organizations need to focus on reducing customer churn.
+
+The good news is that machine learning can help. For many businesses that offer subscription based services, it's critical to both predict customer churn and explain what features relate to customer churn. 
+
+## Data: IBM Watson Dataset 
+We now dive into the IBM Watson Telco Dataset. According to IBM, the business challenge is.
+
+> A telecommunications company [Telco] is concerned about the number of customers leaving their landline business for cable competitors. They need to understand who is leaving. Imagine that you're an analyst at this company and you have to find out who is leaving and why.
+
+The dataset includes information about:
+
+* Customers who left within the last month: `Churn`
+* Services that each customer has signed up for: phone, multiple lines, internet, online security, online backup, device protection, tech support, and streaming TV and movies
+* Customer account information: how long they've been a customer, contract, payment method, paperless billing, monthly charges, and total charges
+* Demographic info about customers: gender, age range, and if they have partners and dependents
+
+
+```{r}
+data <- readRDS(url("https://www.dropbox.com/s/zlqt05ugivl627a/telco_churn.rds?dl=1")) # notice that for readRDS i have to wrap the adress in url()
+```
+
+```{r}
+data %>%
+  glimpse()
+```
+
+
+```{r}
+data %<>%
+  rename(y = Churn) %>%
+  select(y, everything(), -customerID) 
+```
+
+## Data Inspecition and Visualization
+
+```{r}
+data %>% skimr::skim()
+```
+
+Next, lets have a first visual inspections. Many models in our prediction exercise to follow require the conditional distribution of the features to be different for the outcomes states to be predicted. So, lets take a look. Here, `ggplot2` plus the `ggridges` package is my favorite. It is particularly helpfull when dealing with many variables, where you want to see differences in their conditional distribution with respect to an outcome of interest.
+
+```{r,fig.height=5,fig.width=12.5}
+data %>%
+  gather(variable, value, -y) %>% # Note: At one point do pivot_longer instead
+  ggplot(aes(y = as.factor(variable), 
+             fill =  as.factor(y), 
+             x = percent_rank(value)) ) +
+  ggridges::geom_density_ridges(alpha = 0.75)
+```
+
+
+## Data Preprocessing
+
+### Training & Test split
+
+```{r}
+data_split <- initial_split(data, prop = 0.75, strata = y)
+
+data_train <- data_split  %>%  training()
+data_test <- data_split %>% testing()
+```
+
+### Preprocessing recipe
+
+Here, I do the following preprocessing:
+
+* discretize the tenure variable in 3 bins rather than using the contineous value.
+* apply a logarithmic transformation to `TotalCharges`
+* center and scale all numerical values
+* transform categoricl vriables to dummies
+* KNN inpute missing valus
+
+```{r}
+data_recipe <- data_train %>%
+  recipe(y ~.) %>%
+  #step_discretize(tenure, options = list(cuts = 3)) %>%
+  step_log(TotalCharges) %>%
+  step_center(all_numeric(), -all_outcomes()) %>%
+  step_scale(all_numeric(), -all_outcomes()) %>%
+  step_dummy(all_nominal(), -all_outcomes()) %>%
+  step_knnimpute(all_predictors()) %>% #  knn inputation of missing values
+  prep()
+```
+
+
+### Defining the models
+
+#### Logistic Regression
+
+```{r}
+model_lg <- logistic_reg(mode = 'classification') %>%
+  set_engine('glm', family = binomial) 
+```
+
+#### Decision tree
+
+```{r}
+model_dt <- decision_tree(mode = 'classification',
+                          cost_complexity = tune(),
+                          tree_depth = tune(), 
+                          min_n = tune()
+                          ) %>%
+  set_engine('rpart') 
+```
+
+#### Extreme Gradient Boosted Tree (XGBoost)
+
+```{r}
+model_xg <- boost_tree(mode = 'classification', 
+                       trees = 100,
+                       mtry = tune(), 
+                       min_n = tune(), 
+                       tree_depth = tune(), 
+                       learn_rate = tune()
+                       ) %>%
+  set_engine("xgboost") 
+```
+
+#### Define workflow
+
+```{r}
+workflow_general <- workflow() %>%
+  add_recipe(data_recipe) 
+
+workflow_lg <- workflow_general %>%
+  add_model(model_lg)
+
+workflow_dt <- workflow_general %>%
+  add_model(model_dt)
+
+workflow_xg <- workflow_general %>%
+  add_model(model_xg)
+```
+
+### Hyperparameter Tuning
+
+#### Validation Sampling (N-fold crossvlidation)
+
+```{r}
+data_resample <- data_train %>% 
+  vfold_cv(strata = y,
+           v = 3,
+           repeats = 3)
+```
+
+#### Hyperparameter Tuning: Decision Tree
+
+```{r}
+tune_dt <-
+  tune_grid(
+    workflow_dt,
+    resamples = data_resample,
+    grid = 10
+  )
+```
+
+```{r}
+tune_dt %>% autoplot()
+```
+
+```{r}
+best_param_dt <- tune_dt %>% select_best(metric = 'roc_auc')
+best_param_dt
+```
+
+```{r}
+tune_dt %>% show_best(metric = 'roc_auc', n = 1)
+```
+
+#### Hyperparameter Tuning: Random Forest
+
+```{r}
+tune_xg <-
+  tune_grid(
+    workflow_xg,
+    resamples = data_resample,
+    grid = 10
+  )
+```
+
+```{r}
+tune_xg %>% autoplot()
+```
+
+```{r}
+best_param_xg <- tune_xg %>% select_best(metric = 'roc_auc')
+best_param_xg
+```
+
+```{r}
+tune_xg %>% show_best(metric = 'roc_auc', n = 1)
+```
+
+
+#### Fit models with tuned hyperparameters
+
+
+```{r}
+workflow_final_dt <- workflow_dt %>%
+  finalize_workflow(parameters = best_param_dt)
+
+workflow_final_xg <- workflow_xg %>%
+  finalize_workflow(parameters = best_param_xg)
+```
+
+```{r}
+fit_lg <- workflow_lg %>%
+  fit(data_train)
+
+fit_dt <- workflow_final_dt %>%
+  fit(data_train)
+
+fit_xg <- workflow_final_xg %>%
+  fit(data_train)
+```
+
+#### Compare performance
+
+```{r}
+pred_collected <- tibble(
+  truth = data_train %>% pull(y) %>% as.factor(),
+  #base = mean(truth),
+  lg = fit_lg %>% predict(new_data = data_train) %>% pull(.pred_class),
+  dt = fit_dt %>% predict(new_data = data_train) %>% pull(.pred_class),
+  xg = fit_xg %>% predict(new_data = data_train) %>% pull(.pred_class),
+  ) %>% 
+  pivot_longer(cols = -truth,
+               names_to = 'model',
+               values_to = '.pred')
+```
+
+```{r}
+pred_collected %>% head()
+```
+
+
+```{r}
+pred_collected %>%
+  group_by(model) %>%
+  accuracy(truth = truth, estimate = .pred) %>%
+  select(model, .estimate) %>%
+  arrange(desc(.estimate))
+```
+
+```{r}
+pred_collected %>%
+  group_by(model) %>%
+  bal_accuracy(truth = truth, estimate = .pred) %>%
+  select(model, .estimate) %>%
+  arrange(desc(.estimate))
+```
+
+Surprisingly, here the less complex model seems to hve the edge!
+
+#### Final prediction
+
+So, now we are almost there. Since we know we will use the random forest, we only have to predict on our test sample and see how we fair...
+
+```{r}
+fit_last_dt <- workflow_final_dt %>% last_fit(split = data_split)
+```
+
+```{r}
+fit_last_dt %>% collect_metrics()
+```
+
+#### Variable importance
+
+```{r}
+fit_last_dt %>% 
+  pluck(".workflow", 1) %>%   
+  pull_workflow_fit() %>% 
+  vip::vip(num_features = 10)
+```
+
+
+```{r}
+fit_xg %>%
+  pull_workflow_fit() %>%
+  vip::vip(num_features = 10)
+```
+
+# Summing up
+
+# Endnotes
+
+### References
+
+* [Hain, D., & Jurowetzki, R. (2020). Introduction to Rare-Event Predictive Modeling for Inferential Statisticians--A Hands-On Application in the Prediction of Breakthrough Patents. arXiv preprint arXiv:2003.13441.](https://arxiv.org/abs/2003.13441)
+
+### Packages and Ecosystem
+
+* [`tidymodels`](https://www.tidymodels.org/): Tidy statistical and predictive modeling ecosystem
+
+### Further Readings
+
+
+### Session info
+```{r}
+sessionInfo()
+```
