@@ -19,3 +19,5 @@ Coming soon...
 ## RStudioCloud Workspace
 
 * [My ML workshop workspace](https://rstudio.cloud/spaces/58457/join?access_code=upXQB7ijTMKiV7lDpS7Inn3C36BFnG%2Fa0J5PbpcG): Here you will find a project titled 'ML course 2020 Maastricht', where you will find all material to run in the RStudioCloud.
+
+Note: This project might still get updated. So feel free to play around, but the copy you make of it might be in need of update next week.
