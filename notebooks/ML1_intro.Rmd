@@ -368,3 +368,5 @@ roc_log %>% head()
 ```{r}
 roc_log %>% autoplot()
 ```
+
+# Generalization in ML models
