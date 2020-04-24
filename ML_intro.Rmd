@@ -1,0 +1,263 @@
+---
+title: 'Machine Learning: Introduction'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+### Generic preamble
+rm(list=ls())
+Sys.setenv(LANG = "en") # For english language
+options(scipen = 5) # To deactivate annoying scientific number notation
+set.seed(1337) # To have a seed defined for reproducability
+
+### Knitr options
+library(knitr) # For display of the markdown
+knitr::opts_chunk$set(warning=FALSE,
+                     message=FALSE,
+                     fig.align="center"
+                     )
+
+### Install packages if necessary
+if (!require("pacman")) install.packages("pacman") # package for loading and checking packages :)
+
+### Install and oad packages if necessary
+pacman::p_load(tidyverse, magrittr, 
+               tidymodels
+               )
+```
+
+
+# This session 
+
+Welcome all to this introduction to machine learning (ML). In this session we will:
+
+1. Introduce to the general logic of machine learning
+2. xxxx
+
+# Introduction 
+
+## What is ML?
+
+As with any concept, machine learning may have a slightly different definition, depending on whom you ask. A little compilation of definitions by academics and practioneers alike:
+
+* "Machine Learning at its most basic is the practice of using algorithms to parse data, learn from it, and then make a determination or prediction about something in the world." - Nvidia 
+* "Machine learning is the science of getting computers to act without being explicitly programmed." - Stanford
+* "Machine learning is based on algorithms that can learn from data without relying on rules-based programming."- McKinsey & Co.
+* "Machine learning algorithms can figure out how to perform important tasks by generalizing from examples." - University of Washington
+* "The field of Machine Learning seeks to answer the question "How can we build computer systems that automatically improve with experience, and what are the fundamental laws that govern all learning processes?" - Carnegie Mellon University
+
+## Supervised vs. Unsupervised ML
+### Unsupervised ML
+
+Tasks related to pattern recognition and data exploration, in dase there yet does not exist a right answer or problem structure. Main application
+
+1. **Dimensionality reduction:** Finding patterns in the features of the data
+2. **Clustering:** Finding homogenous subgroups within larger group
+
+### Supervised ML
+
+* Concerned with labeling/classification/input-output-mapping/prediction tasks
+* Subject of the next lecture, so stay patient
+
+This is what is currently driving >90% ML applications in research, industry, and policy, and will be the focus on the following sessions.
+
+## Supervised vs. Unsupervised ML
+### An intuitive perspective
+
+![](https://www.dropbox.com/s/45m8ef7qsmqbhvs/ml_super_unsuper2.png?dl=1){width=500x}
+
+### A functional perspective
+
+![](https://www.dropbox.com/s/yeb7tnyo7vkij42/ml_super_unsuper.png?dl=1){width=500x}
+
+
+# Contrasting ML with inferential statistics
+
+## Inferential Statistics
+* Mostly interested in producing good **parameter estimates**: Construct models with unbiased estimates of $\beta$, capturing the relationship  $x$ and $y$.
+* Supposedly \enquote{structural} models: Causal effect of directionality $x \rightarrow y$, robust across a variety of observed as well as up to now unobserved settings.
+* How: Carefully draw from  theories and empirical findings, apply logical reasoning to formulate hypotheses.
+* Typically, multivariate testing, cetris paribus.
+* Main concern: Minimize standard errors $\epsilon$ of $\beta$ estimates.
+* Not overly concerned with overall predictive power (eg. $R^2$) of those models, but about various type of endogeneity issues, leading us to develop sophisticated **identification strategies**
+
+## ML Approach
+* To large extend driven by the needs of the private sector $\rightarrow$ data analysis is gear towards producing good **predictions** of outcomes $\rightarrow$ fits for $\hat{y}$, not $\hat{\beta}$
+     * Recommender systems: Amazon, Netflix, Sportify ect.
+     * Risk scores}: Eg.g likelihood that a particular person has an accident, turns sick, or defaults on their credit.
+     * Image classification: Finding Cats & Dogs online
+     * Predictive policing
+* Often rely on big data (N,$x_i$)
+* Not overly concerned with the properties of parameter estimates, but very rigorous in optimizing the overall prediction accuracy.
+* Often more flexibility wrt. the functional form, and non-parametric approaches.
+* No "build-in"" causality guarantee $\rightarrow$ verification techniques.
+* Often sporadically used in econometric procedures, but seen as "son of a lesser god". 
+
+
+# Statistics Refresher
+
+## Introduction to regression problems {.smaller}
+
+Lets for a second recap linear regression techniques, foremost the common allrounder and workhorse of statistical research since some 100 years.
+
+### OLS Basic Properties
+
+* Outcome: contionous 
+* Predictors: continous, dichotonomous, categorical
+* When to use: Predicting a phenomenon that scales and can be measured continuously
+
+### Functional form
+
+$$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_n x_n + \epsilon $$
+
+ where: 
+ 
+* $y$ = Outcome, $x_i$ = observed value $ID_i$ 
+* $\beta_0$ = Constant 
+* $\beta_i$ = Estimated effect of $x_i$  on $y$ , slope of the linear function 
+* $\epsilon$ = Error term 
+
+--- 
+
+And that is what happens. Lets imagine we plot some feature against an outcome we want to predict. OLS will just fit a straight line through your data.
+
+![](https://www.dropbox.com/s/3v5qka4630kqq6m/reg1.png?dl=1){width=250px}
+
+We do so by minimizing the sum of (squared) errors between our prediction-line and the observed outcome.
+
+![](https://www.dropbox.com/s/1uqge38zhj12sxn/reg2.png?dl=1){width=250px}
+
+## Regression Example
+
+Let' do a brief example for a simple linear model. We generate some data, where $y$ is a linear function of $x$ plus some random error.
+
+```{r}
+data <- tibble(x = runif(500, min = 0, max = 100), 
+               y = 15 + (x*0.3) + rnorm(500, sd = 5))
+```
+
+```{r,echo=FALSE, fig.width=5,fig.height=2.5}
+data %>% ggplot(aes(x = x, y = y)) + 
+  geom_point() +
+  geom_rug(size = 0.1, alpha = 0.75) 
+```
+
+---
+
+We can now fit a linear regression model that aims at discovering the underlying relationship.
+
+```{r}
+fit_lm <- data %>% glm(formula = y ~ x, family = gaussian)
+fit_lm %>% summary()
+```
+
+---
+
+* We can also visualize that
+* We see the model puts a straight line through our data
+* This line tells us how to predict the outcome `y` based on observed values of `x` 
+* The coeffficient indicates the slope of this linear function.
+
+```{r,echo=FALSE, fig.width=5,fig.height=2.5}
+data %>% ggplot(aes(x = x, y = y)) + 
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x, se = TRUE)
+```
+
+## Prediction based on fitted model
+
+* After the model's parameters are fitted, we can use it to pedict our outcome of interest. 
+* Is here done on the same data, but obviously in most cases more elevant on new data.
+
+```{r}
+pred_lm <- fit_lm %>% predict() 
+pred_lm %>% head()
+```
+
+## Assesing predictive power of the model
+
+* So, how well does our model now predict?
+* A common measure of predictive power of regressions models is the *Root-Mean-Squared-Error* (RSME), calculate as follows:
+
+$$ RMSE = \sqrt{\frac{1}{n}\Sigma_{i=1}^{n}{\Big(y_i - \hat{y_i} \Big)^2}}$$
+
+Keep in mind, this root&squared thingy does nothing with the error term except of transforming negative to positive values.
+
+```{r}
+error <-  pull(data, y) -  pred_lm
+
+sqrt(mean(error ^ 2)) # Calculate RMSE
+```
+
+---
+
+* We can also visualize the error term
+* Appears to be rather normally distributed.
+
+```{r}
+error %>% as_tibble() %>%
+  ggplot(aes(x = value)) + 
+  geom_histogram() 
+```
+
+
+## Introduction to classification problems
+
+* Lets assume our outcome of interest is cateegorigal (Yes/No, Class1/Class2/Class3...)
+* 
+
+
+```{r}
+data <- tibble(
+  x = rnorm(500),
+  y = rbinom(500, size = 1, prob = 1/(1+exp(-(5*x))) ) 
+  )
+data %>% head()
+```
+
+---
+
+* This is how it looks like.
+
+```{r,echo=FALSE}
+data %>%
+  ggplot(aes(x = x, y = y)) +
+  geom_point(alpha = 0.5)
+```
+
+---
+
+* We can obviously fit a linear model on it. 
+* What do the predicted values mean then? 
+
+```{r}
+data %>% ggplot(aes(x = x, y = y)) + 
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", formula = y ~ x, se = TRUE)
+```
+
+```{r}
+data %>% ggplot(aes(x = x, y = y)) + 
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE) 
+```
+
+
+
+
+```{r}
+fit_log <- data %>%
+  glm(formula = y ~ x, family = binomial)
+
+fit_log %>% summary
+```
+
+```{r}
+pred_log <- fit_log %>% predict(type = "response") 
+pred_log %>% head()
+```
+
+
+

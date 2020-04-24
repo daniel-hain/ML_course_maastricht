@@ -1,0 +1,850 @@
+---
+title: 'Mchine Learning 2'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+### Generic preamble
+rm(list=ls())
+Sys.setenv(LANG = "en") # For english language
+options(scipen = 5) # To deactivate annoying scientific number notation
+set.seed(1337) # To have a seed defined for reproducability
+
+### Knitr options
+library(knitr) # For display of the markdown
+knitr::opts_chunk$set(warning=FALSE,
+                     message=FALSE,
+                     fig.align="center"
+                     )
+
+### Install packages if necessary
+if (!require("pacman")) install.packages("pacman") # package for loading and checking packages :)
+```
+
+```{r}
+### Install and oad packages if necessary
+pacman::p_load(tidyverse, magrittr, 
+               rpart, # For decision tree models
+               GGally, # For nice ggplot summaries
+               ggridges, # ggplot addon for plotting nice multiple conditional density distributions
+               mlbench, # Collection on ML datasets
+               vip # For variable importance calculation
+               )
+```
+
+# Introduction 
+
+## Contrasting ML&AI with inferential statistics
+
+### Inferential Statistics
+* Mostly interested in producing good **parameter estimates**: Construct models with unbiased estimates of $\beta$, capturing the relationship  $x$ and $y$.
+* Supposedly \enquote{structural} models: Causal effect of directionality $x \rightarrow y$, robust across a variety of observed as well as up to now unobserved settings.
+* How: Carefully draw from  theories and empirical findings, apply logical reasoning to formulate hypotheses.
+* Typically, multivariate testing, cetris paribus.
+* Main concern: Minimize standard errors $\epsilon$ of $\beta$ estimates.
+* Not overly concerned with overall predictive power (eg. $R^2$) of those models, but about various type of endogeneity issues, leading us to develop sophisticated **identification strategies**
+
+
+### ML\&AI Approach
+* To large extend driven by the needs of the private sector $\rightarrow$ data analysis is gear towards producing good **predictions** of outcomes $\rightarrow$ fits for $\hat{y}$, not $\hat{\beta}$
+     * Recommender systems: Amazon, Netflix, Sportify ect.
+     * Risk scores}: Eg.g likelihood that a particular person has an accident, turns sick, or defaults on their credit.
+     * Image classification: Finding Cats \& Dogs online
+* Often rely on big data (N,$x_i$)
+* Not overly concerned with the properties of parameter estimates, but very rigorous in optimizing the overall prediction accuracy.
+* Often more flexibility wrt. the functional form, and non-parametric approaches.
+* No "build-in"" causality guarantee $\rightarrow$ verification techniques.
+* Often sporadically used in econometric procedures, but seen as "son of a lesser god". 
+
+## ML model selection, tuning, and validation processes
+
+### Generalization via "Out-of-Sample-Testing"
+
+With so much freedom wrt. feature selection, functional form ect., models are prone to over-fitting. And no constraints by asymptotic properties, causality and so forth, how can we generalize anything?
+
+In ML, generalization is not achived by statistical derivatives and theoretical argumentation, but rather by answering the practical question: **How well would my model perform with new data?** To answer this question, **Out-of-Sample-Testing** is usually taken as solution. Here, you do the following
+
+1. Split the dataset in a training and a test sample.
+2. Fit you regression (train your model) on one dataset
+     * Optimal: Tune hyperparameters by minimizing loss in a validation set. 
+     * Optimal: Retrain final model configuration on whole training set
+3. Finally, evaluate predictive power on test sample, on which model is not fitted.
+			
+An advanced version is a **N-fold-Crossvalidation**, where this process is repeated several time during the **hyperparameter-tuning** phase (more on that later).
+
+![](https://www.dropbox.com/s/mckm524jdserm2x/cv_steps.png?dl=1){width=750px}
+
+### Bias-Variance Tradeoff
+
+As a rule-of-thumb: Richer and more complex functional forms and algorithms tend to be better in predictign complex real world pattern. This is particularly true for high-dimensional (big) data.
+
+![](https://www.dropbox.com/s/66o5gvtaeh6n5ut/learningmodels.png?dl=1){width=750px}
+
+However, flexible algorithms at one point become so good in mimicing the pattern in our data that they **overfit**, meaning are to much tuned towards a specific dataset and might not reproduce the same accuracy in new data. 
+
+Generally, we call this tension the **bias-variance tradeoff**, which we can decompose in the two components:
+
+* **Bias Error** The simplifying assumptions made by a model to make the target function easier to learn. Generally, simple parametric algorithms have a high bias making them fast to learn and easier to understand but generally less flexible. In turn, they have lower predictive performance on complex problems that fail to meet the simplifying assumptions of the algorithms bias. In turn, they are less prone to overfitting.
+* **Variance Error:** Variance is the amount that the estimate of the target function will change if different data was used. Ideally, it should not change too much from one training dataset to the next, meaning that the algorithm is good at picking out the hidden underlying mapping between the inputs and the output variables. Generally, nonparametric and complex ML algorithms tend to that have a lot of flexibility have a high variance. 
+
+As a result, the predictive performance (on new data) of algorithms and models will always depend on this trade-off between bias and variance. Mathematically, this can be formalized as:
+
+$${\displaystyle \operatorname {E} {\Big [}{\big (}y-{\hat {f}}(x){\big )}^{2}{\Big ]}={\Big (}\operatorname {Bias} {\big [}{\hat {f}}(x){\big ]}{\Big )}^{2}+\operatorname {Var} {\big [}{\hat {f}}(x){\big ]}+\sigma ^{2}}$$
+
+Note that why bias and variance are reducible errors which decline when using a more suitable model to model the underlying relationships in the data, $\sigma^2$ denotes the unreducible complexity caused by random noise, measurement errors, or missing variables, which represent a boundary to our ability to predict given the data at hand.
+
+Lets look at an example. We create some example data, where $x$ is a uniformly distributed random variable bounded between 0 and 1, and $y = sin(n)$ 
+
+```{r}
+data <- tibble(x = runif(50, min = 0, max = 3.14),
+               y = sin(x)  # True function to learn
+               )
+data %>% ggplot(aes(x = x, y = y)) + 
+  geom_point()
+```
+
+How, we add some random noise, which is nbormally distributed
+
+```{r}
+
+error <- rnorm(n = 50, mean = 0, sd = 0.05)
+data %<>% mutate(y_e = y + error)
+```
+
+```{r}
+data %>% ggplot(aes(x = x, y = y_e)) + 
+  geom_point()
+```
+
+
+We see the formerly clearly visible underlying relationship between $x$ and $y$ now to some extent disturbed by this noise. However, keep in mind that the process that generated the data is still $y = sinus(x)$, which would also be the best funtional form to identify by any predictive algorithm.
+
+Lets see how models with different levels of complexity would interpret the reælationship between $x$ and $y$:
+
+  2. $y$ is modeled as a linear function of $x$
+  3. $y$ is modeled as a curvelinear function of $x$
+  3. $y$ is modeled as a compex multinomial function of $x$
+
+```{r}
+data %>% ggplot(aes(x = x, y = y_e)) + 
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x, 
+              se = FALSE, aes(colour = "linear"), linetype = "dashed")  +
+  geom_smooth(method = "lm", formula = y ~ x + poly(x, 2), 
+              se = FALSE, aes(colour = "curvelinear"), linetype = "dotted") +
+  geom_smooth(method = "lm", formula = y ~ x + poly(x, 20), 
+              se = FALSE, aes(colour = "polynomial"), linetype = "longdash")      
+```
+
+In this case, we clearly se that a linear model is too simple, therefore introduces a lot of bias. The curvelinear model indead approximates the underlying relationship correct, while the curvelinear model indeed presents a better fit to the data at hand but misses the underlying relationship. It most likely would perform worse on new data subject to the same random variation.
+
+### Regularization
+The process of minimizing bias and variance errors is called **regularization** (inpractice also refered to as **hyperparameter-tuning**), where we aim at selecting the right model class, functional form, and degree of complexity to jointly minimize in-sample loss but also between-sample variations.
+
+![](https://www.dropbox.com/s/k9eci9w2xqtw3bc/bias_variance2.png?dl=1){width=750px}
+
+Mathematically speaking, we try to minimize a loss function $L(.)$ (eg. RMSE) the following problem:
+
+$$minimize \underbrace{\sum_{i=1}^{n}L(f(x_i),y_i),}_{in-sample~loss} ~ over \overbrace{~ f \in F ~}^{function~class} subject~to \underbrace{~ R(f) \leq c.}_{complexity~restriction}$$
+
+
+# Refresher: 
+
+## Introduction to regression problems (a brief reminder)
+
+Lets for a second recap linear regression techniques, foremost the common allrounder and workhorse of statistical research since some 100 years.
+
+**OLS = Ordinary Least Squares**
+
+**Basic Properties**
+
+* Outcome: contionous 
+* Predictors: continous, dichotonomous, categorical
+* When to use: Predicting a phenomenon that scales and can be measured continuously
+
+
+**Functional form**
+
+$$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_n x_n + \epsilon $$
+
+ where: 
+ 
+* $y$ = Outcome, $x_i$ = observed value $ID_i$ 
+* $\beta_0$ = Constant 
+* $\beta_i$ = Estimated effect of $x_i$  on $y$ , slope of the linear function 
+* $\epsilon$ = Error term 
+
+And that is what happens. Lets imagine we plot some feature against an outcome we want to predict. OLS will just fit a straight line through your data.
+
+![](https://www.dropbox.com/s/3v5qka4630kqq6m/reg1.png?dl=1){width=500px}
+
+We do so by minimizing the sum of (squared) errors between our prediction-line and the observed outcome.
+
+![](https://www.dropbox.com/s/1uqge38zhj12sxn/reg2.png?dl=1){width=500px}
+
+Let' do a brief example for a simple linear model. We generate some data, where $y$ is a linear function of $x$ plus some random error.
+
+```{r}
+set.seed(1337)
+
+data <- tibble(x = runif(500, min = 0, max = 100),
+               y = 15 + (x*0.3) + rnorm(500, sd = 5))
+
+data %>% ggplot(aes(x = x, y = y)) + 
+  geom_point() +
+  geom_rug(size = 0.1, alpha = 0.75) 
+```
+
+We can now fit a linear regression model that aims at discovering the underlying relationship.
+
+```{r}
+fit_lm <- data %>% lm(formula = y ~ x)
+fit_lm %>% summary()
+```
+
+We see it got the underlying relationship somewhat correct. Keep in mind, its ability to discover it is also limited by the small sample, where small random errors dan bias the result.
+
+Note: This is exactly what `geom_smooth()` in `ggplot` does when giving it the `method="lm"` parameter. Lets take a look at it visually.
+
+```{r}
+data %>% ggplot(aes(x = x, y = y)) + 
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x, se = TRUE)
+```
+
+
+
+```{r}
+pred_lm <- fit_lm %>% predict() 
+pred_lm %>% head()
+```
+
+A common measure of predictive power of regressions models is the *Root-Mean-Squared-Error* (RSME), calculate as follows:
+
+$$ RMSE = \sqrt{\frac{1}{n}\Sigma_{i=1}^{n}{\Big(y_i - \hat{y_i} \Big)^2}}$$
+
+Keep in mind, this root&squared thingy does nothing with the error term except of transforming negative to positive values. Lets calculate:
+
+```{r}
+error <-  pull(data, y) -  pred_lm
+
+# Calculate RMSE
+sqrt(mean(error ^ 2))
+# (error ^ 2) %>% mean() %>% sqrt()
+```
+
+We can also visualize the error term:
+
+```{r}
+# Some visualizatiom
+error %>% as_tibble() %>%
+  ggplot(aes(value)) + 
+  geom_histogram()
+```
+
+
+
+
+
+
+## ML workflows for regression analysis
+
+### Define a subset for the hyperparameter tuning
+However, how well does our OLS model predict out-of-sample? To do so, we have to set up an out-of-sample testing workflow. While that cound be done manually, we will use the (my very favorite) `caret` (=ClassificationAndREgressionTraining) package, which has by now grown to be the most popular `R` package for ML, including a standardized ML workflow over more than 100 model classes.
+
+First, we will now split our data in a train and test sample. We could create an index for subsetting manually. However, caret provides the nice `createDataPartition()` function, which does that for you. Nice feature is that it takes care that the outcomes (y) are proportionally distrubuted in the subset. That is particularly important in case the outcomes are very unbalanced.
+
+```{r}
+library(caret)
+index <- createDataPartition(y = data$medv, p = 0.75, list = FALSE) # 75% to 25% split
+
+training <- data[index,] 
+test <- data[-index,] 
+```
+
+### Preprocessing
+Before tuning the models, there is still some final preprocessing to do. For typical preprocessing tasks for ML, I like to use the [`reciepes`](https://tidymodels.github.io/recipes/) package. It lets you conveniently define a recipe of standard ML preprocessing tasks. Afterwards, we can just can use this recipe to "bake" our data, meaning performing all the steps in the recipe. 
+
+Here, we do only some simple transformations. 
+* We normalizizing all numeric data by centering (subtracting the mean) and scaling (divide by standard deviation). 
+* We remove features with zero-variance (we dont have any here, but its a good practice to do that with unknown data).
+
+**Note:** We here also add a simple way to already in the preprocessing deal with missing data. `recipes` has inbuild missing value inputation algorithms, such as "k-nearest-neighbors".
+
+```{r}
+library(recipes)
+reci <- recipe(medv ~ ., data = training) %>%
+  step_center(all_numeric(), -all_outcomes()) %>% # Centers all numeric variables to mean = 0
+  step_scale(all_numeric(), -all_outcomes()) %>% # scales all numeric variables to sd = 1
+  step_zv(all_predictors())  # Removed predictors with zero variance
+
+
+# knn inputation of missing values
+reci %<>%
+  step_knnimpute(all_predictors()) 
+
+# Recipe in the end has to be prepared on the treining data
+reci %<>% 
+  prep(data = train)
+```
+
+```{r}
+reci
+```
+
+
+Now we can "bake" our data, executing the recipe, and split in outcomes and features (is not necessary, but usually an easier workflow lateron).
+
+```{r}
+# Training: split in y and x
+x_train <-bake(reci, new_data = training) %>% select(-medv) 
+y_train <- training %>% pull(medv)
+
+# test: split in y and x
+x_test <-bake(reci, new_data = test) %>% select(-medv) 
+y_test <- test %>% pull(medv)
+```
+
+### Defining the training and control feature
+We now get seriously started with the hyperparameter tuning. We will do so in the following way. We here do a n-fold crossvalidation, meaning that we again split the train sample again in n subsamples, on which we both fit and test every hyperparameter configuration. That minimizes the chance that the results are driven by a particular sampling.  Sounds cumbersome. However, for this workflow caret allows us to automatize this workflow with defining a `trainControl()` object, which we pass to every model we fit lateron.
+
+Here, we have to define a set of parameters. First, the number of crossvalidations. He here for the sake of time do just 2 (`method = "cv", number = 5`), but given enough computing power, RAM and/or time, for a real life calibration, I would recommend 5 or 10 folds. Be aware, though, that time increases exponentially, which might make a difference when working with large data.
+
+```{r}
+ctrl <- trainControl(method = "cv", 
+                     number = 10)
+```
+
+## Hyperparameter Tuning
+So, we finally start fitting models. The logit we skip in this phase, since it has no tunable parameters.
+
+### Linear Regression
+
+```{r}
+fit_lm <- train(x = x_train, 
+                y = y_train, 
+                trControl = ctrl, 
+                method = "glm",
+                family = "gaussian")
+```
+
+```{r}
+fit_lm %>% summary()
+```
+
+```{r}
+fit_lm
+```
+
+Notice the higher RMSE compared to the initial in-sample testing example.
+
+### Elastic Net
+The elastic net has the functional form of a generalized linear model, plus an adittional term $\lambda$ a parameter which penalizes the coefficient by its contribution to the models loss in the form of:
+
+$$\lambda \sum_{p=1}^{P} [ 1 - \alpha |\beta_p| + \alpha |\beta_p|^2]$$
+
+Here, we have 2 tunable parameters, $\lambda$ and $\alpha$.  If $\alpha = 0$, we are left with $|\beta_i|$, turning it to a lately among econometricians very popular **Least Absolute Shrinkage and Selection Operator** (LASSO) regression. Obviously, when $\lambda = 0$, the whole term vanishes, and we are again left with a generalized linear model. The first thing we do now is to set up a tuneGrid, a matrix of value combinations of tunable hyperparameters we aim at optimizing. This is easily done with the base-R `expand.grid()` function.
+
+```{r}
+tune_glmnet = expand.grid(alpha = seq(0, 1, length = 5), 
+                          lambda = seq(0, 1, length = 5))
+tune_glmnet
+```
+
+Now, we utulize the caret `train` function to carry out the grid search as well as crossvalidation of our model. The train function is a wrapper that uses a huge variety (150+) of models from other packages, and carries out the model fitting workflow. Here, we pass the function our feature and outcome vectors (X, y), the parameters in the formerly defined trainControl object, the metric to be optimized, the model class (here "glmnet" from the corresponding package), and our formerly defined tuneGrid. Lets go!
+
+```{r}
+fit_glmnet <- train(x = x_train, 
+                    y = y_train, 
+                    trControl = ctrl, 
+                    method = "glmnet", family = "gaussian", 
+                    tuneGrid = tune_glmnet)
+```
+
+```{r}
+fit_glmnet
+```
+
+We can also plot the results of the hyperparameter testing exercise via grid-search. Note: `caret` model resuls already have a predefined plotting setting for `ggplot`.
+
+```{r}
+fit_glmnet %>% ggplot()
+```
+
+
+### Model evaluation
+So, taking all together, lets see which model performs best out-of-sample:
+
+```{r}
+pred_lm <- predict(fit_glmnet, newdata = x_test) 
+pred_glmnet <- predict(fit_glmnet, newdata = x_test) 
+
+# RMSE OLS
+sqrt(mean( (y_test - predict(fit_lm, newdata = x_test) ) ^ 2))
+sqrt(mean( (y_test - predict(fit_glmnet, newdata = x_test) ) ^ 2))
+```
+
+Notice again the higher RMSE for total out-of-sample testing. Here, the results are pretty similar, so we in fact see no advantage of variable selection via `glmnet`.
+
+# ML for Classification
+
+## Introduction
+
+##  Model assesments and metrics for classification problems
+
+We remeber that the most commonly used performance measure for regression problems is the **RMSE**. However, how to we assess models aimed to solve classification problems? Here, it is not that straightforward, and we could (depending on the task) use different ones.
+
+### The Confusion matrix and its metrics
+
+The **Confusion Matrix** (in inferential statistics you would call it **Classification Table**, so don't get confused) is the main source 
+
+![](https://www.dropbox.com/s/dn1juxbdfm8ryi8/cf1.jpg?dl=1){width=750px}
+
+It is the 2x2 matrix with the foillowing cells:
+
+* **True Positive:** (TP)
+     * Interpretation: You predicted positive and it's true.
+     * You predicted that a woman is pregnant and she actually is.
+* **True Negative:** (TN)
+     * Interpretation: You predicted negative and it's true.
+     * You predicted that a man is not pregnant and he actually is not.
+* **False Positive:** (FP) - (Type 1 Error)
+     * Interpretation: You predicted positive and it's false.
+     * You predicted that a man is pregnant but he actually is not.
+* **False Negative:** (FN) - (Type 2 Error)
+     * Interpretation: You predicted negative and it's false.
+     * You predicted that a woman is not pregnant but she actually is.
+
+Just remember, We describe predicted values as **Positive** and **Negative** and actual values as **True** and **False**. Out of combinations of these values, we dan derive a set of different quality measures.
+
+![](https://www.dropbox.com/s/dcoa3pumpcrchsp/metrics2.png?dl=1){width=750px}
+
+**Accuracy** (ACC)
+$$ {ACC} ={\frac {\mathrm {TP} +\mathrm {TN} }{P+N}}={\frac {\mathrm {TP} +\mathrm {TN} }{\mathrm {TP} +\mathrm {TN} +\mathrm {FP} +\mathrm {FN} }} $$
+
+** Sensitivity,** also called recall, hit rate, or true positive rate (TPR)
+$$ {TPR} ={\frac {\mathrm {TP} }{P}}={\frac {\mathrm {TP} }{\mathrm {TP} +\mathrm {FN} }}=1-\mathrm {FNR} $$
+
+**Specificity**, also called selectivity or true negative rate (TNR)
+$$ {TNR} ={\frac {\mathrm {TN} }{N}}={\frac {\mathrm {TN} }{\mathrm {TN} +\mathrm {FP} }}=1-\mathrm {FPR} $$ 
+
+**Precision**, also called positive predictive value (PPV)
+$$ {PPV} ={\frac {\mathrm {TP} }{\mathrm {TP} +\mathrm {FP} }} $$ 
+
+**F1 score**: is the harmonic mean of precision and sensitivity, meaning a weighted average of the true positive rate (recall) and precision.
+$$ F_{1}=2\cdot {\frac {\mathrm {PPV} \cdot \mathrm {TPR} }{\mathrm {PPV} +\mathrm {TPR} }}={\frac {2\mathrm {TP} }{2\mathrm {TP} +\mathrm {FP} +\mathrm {FN} }} $$
+
+So, which one should we use? Answer is: Depends on the problem. Are you more sensitive towards false negative or false positives? Do you have a balanced or unbalanced distribution of classes? How high is the importance of false positives compared to false negatives? Think about it for a moment.
+
+Lets do a minimal example. We create again a simple dataframe:
+
+```{r}
+data <- tibble(
+  x = runif(50, min = 0, max = 1),
+  y = 0.1 + x*0.8 + rnorm(50, sd = 0.1)
+  )
+
+# Code y binary
+data %<>%
+  mutate(y = ifelse(y > 0.5, "Yes", "No") %>% as.factor())
+```
+
+```{r}
+data %>%
+  ggplot(aes(x = x, y = y)) +
+  geom_point()
+```
+
+We now fit a simple logistic regression. We can again use `glm`, this time only with argument `family = binomial`.
+
+```{r}
+fit_log <- glm(formula = y ~ x, family = binomial, data = data)
+```
+
+```{r}
+fit_log %>% summary()
+```
+
+Lets plot the model:
+
+```{r}
+data %>%
+ggplot(aes(x = x, y = y)) + 
+  geom_point() + 
+  stat_smooth(method="glm", method.args=list(family="binomial"), se=TRUE)
+```
+
+```{r}
+pred_log <- predict(fit_log, type = "response")
+pred_log <- ifelse(pred_log > 0.5, "Yes", "No") %>% as.factor()
+```
+
+Lets take a look at the confusion matrix (`caret` function):
+
+```{r}
+confusionMatrix(data$y, pred_log, positive = "Yes")
+```
+
+Wow, all correct, what a great model! Or... ?
+
+
+# Case Study: Classification of Customer Churn
+
+![](https://www.dropbox.com/s/mntme31mtkri2kr/churn.jpg?dl=1){width=750px}
+
+## Introduction: Customer Churn: Hurts Sales, Hurts Company
+Customer churn refers to the situation when a customer ends their relationship with a company, and it's a costly problem. Customers are the fuel that powers a business. Loss of customers impacts sales. Further, it's much more difficult and costly to gain new customers than it is to retain existing customers. As a result, organizations need to focus on reducing customer churn.
+
+The good news is that machine learning can help. For many businesses that offer subscription based services, it's critical to both predict customer churn and explain what features relate to customer churn. 
+
+## Data: IBM Watson Dataset 
+We now dive into the IBM Watson Telco Dataset. According to IBM, the business challenge is.
+
+> A telecommunications company [Telco] is concerned about the number of customers leaving their landline business for cable competitors. They need to understand who is leaving. Imagine that you're an analyst at this company and you have to find out who is leaving and why.
+
+The dataset includes information about:
+
+* Customers who left within the last month: `Churn`
+* Services that each customer has signed up for: phone, multiple lines, internet, online security, online backup, device protection, tech support, and streaming TV and movies
+* Customer account information: how long they've been a customer, contract, payment method, paperless billing, monthly charges, and total charges
+* Demographic info about customers: gender, age range, and if they have partners and dependents
+Lets load it:
+```{r}
+rm(list=ls()); graphics.off() # get rid of everything in the workspace
+data <- readRDS(url("https://www.dropbox.com/s/zlqt05ugivl627a/telco_churn.rds?dl=1")) # notice that for readRDS i have to wrap the adress in url()
+```
+
+
+## Data Inspection, exploration, preprocessing
+
+Lets inspect our data:
+
+```{r}
+data %>% head()
+```
+
+```{r}
+data %>% glimpse()
+```
+
+
+Lets do right away some preprocessing, and drop the customer ID, which we do not need. Let's also say we're lazy today, so we just prop observations with missing features (not good practice).
+
+```{r}
+data %<>%
+  select(-customerID) %>%
+  drop_na() %>%
+  select(Churn, everything())
+```
+
+Next, lets have a first visual inspections. Many models in our prediction exercise to follow require the conditional distribution of the features to be different for the outcomes states to be predicted. So, lets take a look. Here, `ggplot2` plus the `ggridges` package is my favorite. It is particularly helpfull when dealing with 
+
+```{r,fig.height=5,fig.width=12.5}
+library(ggridges)
+data %>%
+  gather(variable, value, -Churn) %>%
+  ggplot(aes(y = as.factor(variable), 
+             fill =  as.factor(Churn), 
+             x = percent_rank(value)) ) +
+  geom_density_ridges(alpha = 0.75)
+```
+
+Again, we split in a training and test dataset.
+
+```{r}
+index <- createDataPartition(y = data$Churn, p = 0.75, list = FALSE)
+
+training <- data[index,] 
+test <- data[-index,] 
+```
+
+
+```{r}
+library(recipes)
+reci <- recipe(Churn ~ ., data = training) %>%
+  step_discretize(tenure, options = list(cuts = 6)) %>%
+  step_log(TotalCharges) %>%
+  step_dummy(all_nominal(), -all_outcomes()) %>%
+  step_center(all_predictors(), -all_outcomes()) %>%
+  step_scale(all_predictors(), -all_outcomes()) %>%
+  prep(data = training)
+
+reci
+```
+
+Now we just split again in predictors and outcomes, bake it all, and we are good to go.
+
+```{r}
+# Predictors
+x_train <- bake(reci, new_data = training) %>% select(-Churn)
+x_test  <- bake(reci, new_data = test) %>% select(-Churn)
+
+# Response variables for training and testing sets
+# Note that we have to code the outcome (churn) here as factor. Will be important later, since most classification models demand factors as outcomes
+y_train <- pull(training, Churn) %>% as.factor()
+y_test  <- pull(test, Churn) %>% as.factor()
+```
+
+## Classification
+
+We again define a `trainControl()` object. However, now we need some adittional parameters. In particular, we now need a `twoClassSummary`, and `classProbs` (both mainly for model evaluation lateron)
+
+We will also use another trick. Up to now we defined our own `tinegrid`. This is a good exercise. However, we have a more convenient and efficient way to do so: While this is usually done via a grid-search over all possible combinations, I instead use an adaptive resampling procedure (see [this paper](https://arxiv.org/abs/1405.6974)), which adaptively resamples the tuning parameter grid in a way that concentrates on values that are the in the neighborhood of the optimal settings. 
+
+We therefore also define a `n_tune` value for how often this should be done. This will later be passed on to the `tuneLength` parameter of the `train()` workflow.
+
+```{r}
+ctrl <- trainControl(method = "cv", # repeatedcv, boot, cv, LOOCV, timeslice OR adaptive etc.
+                     number = 10, # Number of CV's
+                     classProbs = TRUE, # Include probability of class prediction
+                     savePredictions = TRUE, # Save the prediction results
+                     summaryFunction = twoClassSummary, # Which type of summary statistics to deliver
+                     verboseIter = FALSE,
+                     # add adaptive resampling for hyperparamether search
+                     adaptive = list(min = 3, 
+                                     alpha = 0.05, 
+                                     method = "gls", 
+                                     complete = TRUE),
+                     search = "random" )
+
+metric <- "Accuracy" # Which metric should be optimized (more on that later)
+n_tune = 10 # number of tuning rounds
+```
+
+
+### Standard logistic regression
+
+Lets run the common allrounder first:
+
+```{r}
+fit_log <- train(x = x_train, 
+                 y = y_train, 
+                 trControl = ctrl, 
+                 metric = metric,
+                 method = "glm", family = "binomial") 
+```
+
+```{r}
+fit_log %>% summary()
+```
+
+```{r}
+fit_log
+```
+
+### Decision tree
+
+#### Introduction
+Ok, next we will do the same exercise for a classification tree. Some brief reminder what this interesting family of models is about:
+
+* Mostly used in classification problems on continuous or categorical variables.
+* Idea: split the population or sample into two or more homogeneous sets (or sub-populations) based on most significant splitter / differentiator in input variables.
+* Repeat till stop criterium reachesd. leads to a tree-like structure.
+
+![](https://www.dropbox.com/s/rhdx8upcikkun7p/regtree0.png?dl=1){width=750px}
+
+This class became increasingly popular in business and other applications. Some reasons are:
+
+* Easy to Understand: Decision tree output is very easy to understand even for people from non-analytical background.
+* Useful in Data exploration: Decision tree is one of the fastest way to identify most significant variables and relation between two or more variables.
+* Data type is not a constraint: It can handle both numerical and categorical variables.
+* Non Parametric Method: Decision tree is considered to be a non-parametric method. This means that decision trees have no assumptions about the space distribution and the classifier structure.
+
+Some tree terminology:
+
+* **Root Node:** Entire population or sample and this further gets divided into two or more homogeneous sets.
+* **Splitting:** It is a process of dividing a node into two or more sub-nodes.
+* **Decision Node:** When a sub-node splits into further sub-nodes, then it is called decision node.
+* **Leaf/ Terminal Node:** Nodes do not split is called Leaf or Terminal node.
+
+![](https://www.dropbox.com/s/j5ise9gi226rsnn/regtree2.png?dl=1){width=750px}
+
+
+The decision of making strategic splits heavily affects a tree's accuracy. So, How does the tree decide to split? This is different across the large family of tree-like models. Common approaches:
+
+* Gini Index
+* $\chi^2$ 
+* Reduction in $\sigma^2$
+
+Some common complexity restrictions are:
+
+* Minimum samples for a node split
+* Minimum samples for a terminal node (leaf)
+* Maximum depth of tree (vertical depth)
+* Maximum number of terminal nodes
+* Maximum features to consider for split	
+
+![](https://www.dropbox.com/s/ju3mj0onq8mhp74/regtree1.png?dl=1){width=750px}
+
+Likewise, there are a veriety of tunable hyperparameters across different applications of this model family.
+
+![](https://www.dropbox.com/s/dwl89havzpl1qla/regtree3.png?dl=1){width=750px}
+
+#### Application
+Ok, lets run it! We here use `rpart`, but there is a huge variety available. This one has only one tunable parameter. Here we are able to restrict the complexity via a hyperparameter cp. This parameter represents the complexity costs of every split, and allows further splits only if it leads to an decrease in model loss below this threshold.
+
+
+```{r}
+library(rpart)
+fit_dt <- train(x = x_train, 
+                y = y_train, 
+                trControl = ctrl, 
+                metric = metric,
+                tuneLength = n_tune,
+                method = "rpart") 
+```
+
+```{r}
+fit_dt
+```
+
+```{r}
+fit_dt %>% ggplot()
+```
+
+
+We can also plot the final plot structure.
+
+```{r,fig.width=15,fig.height=5}
+require(rpart.plot)
+fit_dt$finalModel %>% rpart.plot()
+```
+
+This plot is usually informative, and gives us a nice intuition how the prediction works in classification trees. However, with that many dummies, it's a bit messy.
+
+### Random Forest
+
+![](https://www.dropbox.com/s/pqtv0wjjplyzwp9/rf1.png?dl=1){width=750px}
+
+#### Introduction
+Finally, we fit another class of models which has gained popularity in the last decade, and proven to be a powerful and versatile prediction technique which performs well in almost every setting, a random forest. It is among the most popular non-neural-network ML algorithms, and by some considered to be a panacea of all data science problems. Some say: "when you can't think of any algorithm (irrespective of situation), use random forest!""
+
+As a continuation of tree-based classification methods, random forests aim at reducing overfitting by introducing randomness via bootstrapping, boosting, and ensemble techniques. It is a type of ensemble learning method, where a group of weak models combine to form a powerful model. The idea here is to create an "ensemble of classification trees"", all grown out of a different bootstrap sample. Having grown a forest of trees, every tree performs a prediction, and the final model prediction is formed by a majority vote of all trees. This idea close to Monte Carlo simulation approaches, tapping in the power of randomness.
+
+![](https://www.dropbox.com/s/f0a2afec92awyw0/rf2.png?dl=1){width=750px}
+
+#### Application
+In this case, we draw from a number of tunable hyperparameters. First, we tune the number of randomly selected features which are available candidates for every split on a range $[1,k-1]$, where lower values introduce a higher level of randomness to every split. Our second hyperparameter is the minimal number of observations which have to fall in every split, where lower numbers increase the potential precision of splits, but also the risk of overfitting. Finally, we also use the general splitrule as an hyperparameter, where the choice is between i.) a traditional split according to a the optimization of the gini coefficient of the distribution of classes in every split, and ii.) according to the "Extremely randomized trees"" (`ExtraTree`) procedure by Geurts (2016), where adittional randomness is introduced to the selection of splitpoints.
+
+Note: We here use the `ranger` instead of the more popular `randomforest` package. For those who wonder: It basically does the same, only faster.
+
+```{r}
+library(ranger)
+#tune.rf <- expand.grid(mtry = round(seq(1, ncol(x_train)-1, length = 3)),
+#                       min.node.size = c(10, 50, 100),
+#                       splitrule = c("gini", "extratrees") )
+                       
+fit_rf <- train(x = x_train, 
+                y = y_train, 
+                trControl = ctrl,  
+                metric = metric,
+                tuneLength = n_tune,
+                method = "ranger", 
+                importance = "impurity", # To define how to measure variable importantce (later more)
+                num.trees = 25
+                )
+```
+
+```{r}
+fit_rf
+```
+
+```{r}
+fit_rf %>% ggplot()
+```
+
+we see that number of randomly selected features per split of roughly half of all available features in all cases maximizes model performance. Same goes for a high minimal number of observations (100) per split. Finally, the ExtraTree procedure first underperforms at a a minimal amount of randomly selected features, but outperforms the traditional gini-based splitrule when the number of available features increases. Such results are typical for large samples, where a high amount of injected randomness tends to make model predictions more robust.
+
+## Evaluation via final out-of-sample prediction
+Ok, we by now tuned three different models with varying complexity. To be sure how they perform on new data, we now put them to the test to predict `churn` in the 
+
+lets do the final evaluation. generally, many ML exercises can be done without it, and it is often common practice to go with the performance in the k-fold crossfalidation. However, I believe this final step should be done, if data permits. Only with this final prediction we expose our model to data it yet was not exposed to, neiter directly nor indirectly. 
+
+we first let all models predict all models do their prediction on "test". 
+**Note:** We here predicted class of the outcome (where positive means $P \leq 0.5$). To instead report the predicted probabilitym use the argument `type = "prob"`).
+
+```{r}
+pred_log <- predict(fit_log, newdata = x_test)
+pred_dt <- predict(fit_dt, newdata = x_test)
+pred_rf <- predict(fit_rf, newdata = x_test)
+```
+
+```{r}
+pred_log %>% head()
+```
+
+Now, 
+
+```{r}
+print("====== Out-of-Sample Validation: Logistic Regression ======")
+confusionMatrix(pred_log, y_test, positive = "Yes")
+print("====== Out-of-Sample Validation: Decision Tree ======")
+confusionMatrix(pred_dt, y_test, positive = "Yes")
+print("====== Out-of-Sample Validation: Random Forest ======")
+confusionMatrix(pred_rf, y_test, positive = "Yes")
+```
+
+# Model explainability
+Machine learning (ML) models are often considered black boxes due to their complex inner-workings. More advanced ML models such as random forests, gradient boosting machines (GBM), artificial neural networks (ANN), among others are typically more accurate for predicting nonlinear, faint, or rare phenomena. Unfortunately, more accuracy often comes at the expense of interpretability, and interpretability is crucial for business adoption, model documentation, regulatory oversight, and human acceptance and trust. Luckily, several advancements have been made to aid in interpreting ML models.
+
+![](https://www.dropbox.com/s/r5w3o80q3k3prdm/interpret.png?dl=1){width=750px}
+
+Moreover, it's often important to understand the ML model that you've trained on a global scale, and also to zoom into local regions of your data or your predictions and derive local explanations. 
+
+* **Global interpretations** help us understand the inputs and their entire modeled relationship with the prediction target, but global interpretations can be highly approximate in some cases. 
+* **Local interpretation** help us understand model predictions for a single row of data or a group of similar rows.
+
+
+## Global explanation
+Finally, let's get a feeling what variables the models mostly draw from. There are numerous ways for such inspections, in which we will dewll deeper in later lectures. Here, I just want to present the most intuitive and common one, **Variable Importance**.
+
+Most (but not all) model classes offer some possibility to derive measures of variable importance. Note, this is currently not implemented for SVMs. Again, in most ML models and setups, these meastures are nice to give a rough intuition, but CANNOT be interpreted as constant marginal effects, left alone causal.
+
+```{r,fig.height=7.5,fig.width=12.5}
+library(vip)
+```
+
+```{r}
+vip(fit_log) + ggtitle("VarImp: Logistic Regression")
+```
+
+```{r}
+vip(fit_dt) + ggtitle("VarImp: Decision Tree")
+```
+
+```{r}
+vip(fit_rf) + ggtitle("VarImp: Random Forest")
+```
+
+## Local interpretations
+In complex nonparametric models, it is often more helpful to get explanations why a certain datapoint is classified in the way it is than to look at the overall importance of variables. 
+
+
+
+**Local Interpretable Model-agnostic Explanations** (LIME) is a visualization technique that helps explain individual predictions. As the name implies, it is model agnostic so it can be applied to any supervised regression or classification model. There is a neath `R` implementation in the [`lime`](https://github.com/thomasp85/lime) package. If you want to investigate further, feel free! Otherwise, keep in mind this exists, we will come back to it again in later lectures.
+
+BTW: The original paper is mindblowing, if you find time, just read it!
+
+* Marco Tulio Ribeiro, Sameer Singh, and Carlos Guestrin. 2016. ""hy Should I Trust You?: Explaining the Predictions of Any Classifier." In Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD 2016). ACM, New York, NY, USA, 1135-1144. DOI: https://doi.org/10.1145/2939672.2939778
+
+
+# Your turn
+So, it's time to predict something! Please do **Exercise 1** in the corresponding section on `Github`.
+Go and find a clever way to predict whine quality! :) 
+
+# Endnotes
+
+```{r}
+sessionInfo()
+````
+

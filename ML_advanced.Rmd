@@ -1,0 +1,35 @@
+---
+title: 'Mchine Learning 2'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+### Generic preamble
+rm(list=ls())
+Sys.setenv(LANG = "en") # For english language
+options(scipen = 5) # To deactivate annoying scientific number notation
+set.seed(1337) # To have a seed defined for reproducability
+
+### Knitr options
+library(knitr) # For display of the markdown
+knitr::opts_chunk$set(warning=FALSE,
+                     message=FALSE,
+                     fig.align="center"
+                     )
+
+### Install packages if necessary
+if (!require("pacman")) install.packages("pacman") # package for loading and checking packages :)
+pacman::p_load(tidyverse, # Standard datasciewnce toolkid (dplyr, ggplot2 et al.)
+               magrittr # For advanced piping (%>% et al.)
+               )
+```
