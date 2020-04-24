@@ -470,7 +470,7 @@ In this case, we clearly se that a linear model is too simple, therefore introdu
 
 ## Regularization {.smaller}
 
-!https://www.dropbox.com/s/3svghvjeukabrwp/ml_complexity_error.png?dl=1[](){width=500px}
+![https://www.dropbox.com/s/3svghvjeukabrwp/ml_complexity_error.png?dl=1(){width=500px}
 
 *  The process of minimizing bias and variance errors is called **regularization** (inpractice also refered to as **hyperparameter-tuning**)
 * We aim at selecting the right model class, functional form, and degree of complexity to jointly minimize in-sample loss but also between-sample variations.
@@ -494,7 +494,23 @@ $$minimize \underbrace{\sum_{i=1}^{n}L(f(x_i),y_i),}_{in-sample~loss} ~ over \ov
 
 ---
 
-![](https://www.dropbox.com/s/dogot9mi70y5ueq/ml_hyperparam2.png?dl=1){width=750px}
+## Crossvalidation {.smaller}
+
+1. Split the dataset in a training and a test sample.
+2. Fit you regression (train your model) on one dataset
+     * Optimal: Tune hyperparameters by minimizing loss in a validation set. 
+     * Optimal: Retrain final model configuration on whole training set
+3. Finally, evaluate predictive power on test sample, on which model is not fitted.
+			
+An advanced version is a **N-fold-Crossvalidation**, where this process is repeated several time during the **hyperparameter-tuning** phase (more on that later).
+
+---
+
+![](https://www.dropbox.com/s/mckm524jdserm2x/cv_steps.png?dl=1){width=750px}
+
+## Tune Grids
+
+![](https://www.dropbox.com/s/dogot9mi70y5ueq/ml_hyperparam2.png?dl=1){width=500px}
 
 ---
 
