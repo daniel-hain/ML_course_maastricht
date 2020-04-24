@@ -1,6 +1,6 @@
 # Introduction to Machine Learning for Policy Analysis (Maastricht 2020)
 
-Dear Stdents, welcome to the course repository, where you will find all informations supplementing this terms machine learning curse.
+Dear Students, welcome to the course repository, where you will find all informations supplementing this terms machine learning curse.
 
 ## Notebooks
 
