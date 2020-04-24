@@ -9,7 +9,7 @@ Dear Stdents, welcome to the course repository, where you will find all informat
 
 Note: In the [Notebooks](https://github.com/daniel-hain/ML_course_2020_maastricht/tree/master/notebooks) folder, also all `.Rmd` files I used to create the html files are acessible.
 
-# Videos
+## Videos
 
 Coming soon...
 
