@@ -34,7 +34,9 @@ pacman::p_load(tidyverse, magrittr,
 Welcome all to this introduction to machine learning (ML). In this session we will:
 
 1. Introduce to the general logic of machine learning
-2. xxxx
+2. How to generalize?
+3. The Bias-Variance Tradeoff
+4. Selecting and tuning ML models
 
 # Introduction 
 

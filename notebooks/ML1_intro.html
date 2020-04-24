@@ -3130,7 +3130,9 @@ slide:not(.current) .plotly.html-widget{
 
 <ol>
 <li>Introduce to the general logic of machine learning</li>
-<li>xxxx</li>
+<li>How to generalize?</li>
+<li>The Bias-Variance Tradeoff</li>
+<li>Selecting and tuning ML models</li>
 </ol>
 
 </article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Introduction</h2></hgroup><article  id="introduction">
@@ -3147,7 +3149,7 @@ slide:not(.current) .plotly.html-widget{
 <li>&ldquo;The field of Machine Learning seeks to answer the question&rdquo;How can we build computer systems that automatically improve with experience, and what are the fundamental laws that govern all learning processes?&quot; - Carnegie Mellon University</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Supervised vs. Unsupervised ML</h2></hgroup><article  class="smaller" id="supervised-vs.unsupervised-ml">
+</article></slide><slide class=""><hgroup><h2>Supervised vs. Unsupervised ML</h2></hgroup><article  id="supervised-vs.unsupervised-ml" class="smaller">
 
 <h3>Unsupervised ML</h3>
 
@@ -3179,7 +3181,7 @@ slide:not(.current) .plotly.html-widget{
 
 </article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Contrasting ML with inferential statistics</h2></hgroup><article  id="contrasting-ml-with-inferential-statistics">
 
-</article></slide><slide class=""><hgroup><h2>Inferential Statistics</h2></hgroup><article  class="smaller" id="inferential-statistics">
+</article></slide><slide class=""><hgroup><h2>Inferential Statistics</h2></hgroup><article  id="inferential-statistics" class="smaller">
 
 <ul>
 <li>Mostly interested in producing good <strong>parameter estimates</strong>: Construct models with unbiased estimates of \(\beta\), capturing the relationship \(x\) and \(y\).</li>
@@ -3190,7 +3192,7 @@ slide:not(.current) .plotly.html-widget{
 <li>Not overly concerned with overall predictive power (eg. \(R^2\)) of those models, but about various type of endogeneity issues, leading us to develop sophisticated <strong>identification strategies</strong></li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>ML Approach</h2></hgroup><article  class="smaller" id="ml-approach">
+</article></slide><slide class=""><hgroup><h2>ML Approach</h2></hgroup><article  id="ml-approach" class="smaller">
 
 <ul>
 <li>To large extend driven by the needs of the private sector \(\rightarrow\) data analysis is gear towards producing good <strong>predictions</strong> of outcomes \(\rightarrow\) fits for \(\hat{y}\), not \(\hat{\beta}\)
@@ -3210,7 +3212,7 @@ slide:not(.current) .plotly.html-widget{
 
 </article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Statistics Refresher</h2></hgroup><article  id="statistics-refresher">
 
-</article></slide><slide class=""><hgroup><h2>Introduction to regression problems</h2></hgroup><article  class="smaller" id="introduction-to-regression-problems">
+</article></slide><slide class=""><hgroup><h2>Introduction to regression problems</h2></hgroup><article  id="introduction-to-regression-problems" class="smaller">
 
 <p>Lets for a second recap linear regression techniques, foremost the common allrounder and workhorse of statistical research since some 100 years.</p>
 
@@ -3439,7 +3441,7 @@ pred_log %&gt;% head()</pre>
 <pre >##            1            2            3            4            5            6 
 ## 0.9985295080 0.9990980691 0.0001654282 0.0019227821 0.7086567685 0.0053889265</pre>
 
-</article></slide><slide class=""><hgroup><h2>Model assesments and metrics for classification problems</h2></hgroup><article  class="smaller" id="model-assesments-and-metrics-for-classification-problems">
+</article></slide><slide class=""><hgroup><h2>Model assesments and metrics for classification problems</h2></hgroup><article  id="model-assesments-and-metrics-for-classification-problems" class="smaller">
 
 <img width="500px" src='https://www.dropbox.com/s/dn1juxbdfm8ryi8/cf1.jpg?dl=1' title=''/>
 
@@ -3450,7 +3452,7 @@ pred_log %&gt;% head()</pre>
 <li>The <strong>Confusion Matrix</strong> (in inferential statistics you would call it <strong>Classification Table</strong>, so don’t get confused) is the main source</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Confussion Matrix Unpacked</h2></hgroup><article  class="smaller" id="confussion-matrix-unpacked">
+</article></slide><slide class=""><hgroup><h2>Confussion Matrix Unpacked</h2></hgroup><article  id="confussion-matrix-unpacked" class="smaller">
 
 <p>It is the 2x2 matrix with the foillowing cells:</p>
 
@@ -3483,7 +3485,7 @@ pred_log %&gt;% head()</pre>
 <li>Out of combinations of these values, we dan derive a set of different quality measures.</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Summary of Metrics</h2></hgroup><article  class="smaller" id="summary-of-metrics">
+</article></slide><slide class=""><hgroup><h2>Summary of Metrics</h2></hgroup><article  id="summary-of-metrics" class="smaller">
 
 <p><strong>Accuracy</strong> (ACC) \[ {ACC} ={\frac {\mathrm {TP} + \mathrm {TN} }{P+N}} \]</p>
 
@@ -3569,7 +3571,7 @@ roc_log %&gt;% head()</pre>
 
 </article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Generalization in ML models</h2></hgroup><article  id="generalization-in-ml-models">
 
-</article></slide><slide class=""><hgroup><h2>Generalization via &ldquo;Out-of-Sample-Testing&rdquo;</h2></hgroup><article  class="smaller" id="generalization-via-out-of-sample-testing">
+</article></slide><slide class=""><hgroup><h2>Generalization via &ldquo;Out-of-Sample-Testing&rdquo;</h2></hgroup><article  id="generalization-via-out-of-sample-testing" class="smaller">
 
 <p>With so much freedom wrt. feature selection, functional form ect., models are prone to over-fitting. And no constraints by asymptotic properties, causality and so forth, how can we generalize anything?</p>
 
@@ -3601,7 +3603,7 @@ roc_log %&gt;% head()</pre>
 <li>However, flexible algorithms at one point become so good in mimicing the pattern in our data that they <strong>overfit</strong>, meaning are to much tuned towards a specific dataset and might not reproduce the same accuracy in new data.</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Bias-Variance Tradeoff</h2></hgroup><article  class="smaller" id="bias-variance-tradeoff-1">
+</article></slide><slide class=""><hgroup><h2>Bias-Variance Tradeoff</h2></hgroup><article  id="bias-variance-tradeoff-1" class="smaller">
 
 <p>Generally, we call this tension the <strong>bias-variance tradeoff</strong>, which we can decompose in the two components:</p>
 
@@ -3617,7 +3619,7 @@ roc_log %&gt;% head()</pre>
 <li>Note that why bias and variance are reducible errors which decline when using a more suitable model to model the underlying relationships in the data, \(\sigma^2\) denotes the unreducible complexity caused by random noise, measurement errors, or missing variables, which represent a boundary to our ability to predict given the data at hand.</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Example</h2></hgroup><article  class="smaller" id="example">
+</article></slide><slide class=""><hgroup><h2>Example</h2></hgroup><article  id="example" class="smaller">
 
 <ul>
 <li>We create some data, where \(x\) is a uniformly distributed random variable bounded between 0-1, and \(y = sin(n)\)</li>
@@ -3659,7 +3661,7 @@ data %&lt;&gt;% mutate(y_e = y + error)</pre>
 
 <img width="750px" src='https://www.dropbox.com/s/yai8hbcvbo3haoq/ml_bias_variance1.jpg?dl=1' title=''/>
 
-</article></slide><slide class=""><hgroup><h2>Regularization</h2></hgroup><article  class="smaller" id="regularization">
+</article></slide><slide class=""><hgroup><h2>Regularization</h2></hgroup><article  id="regularization" class="smaller">
 
 <p>!<a href='https://www.dropbox.com/s/3svghvjeukabrwp/ml_complexity_error.png?dl=1' title=''>https://www.dropbox.com/s/3svghvjeukabrwp/ml_complexity_error.png?dl=1</a><a href='' title=''></a></p>
 
@@ -3730,7 +3732,7 @@ data %&lt;&gt;% mutate(y_e = y + error)</pre>
 <li>Non Parametric Method: Decision tree is considered to be a non-parametric method. This means that decision trees have no assumptions about the space distribution and the classifier structure.</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Some tree terminology</h2></hgroup><article  class="smaller" id="some-tree-terminology">
+</article></slide><slide class=""><hgroup><h2>Some tree terminology</h2></hgroup><article  id="some-tree-terminology" class="smaller">
 
 <ul>
 <li><strong>Root Node:</strong> Entire population or sample and this further gets divided into two or more homogeneous sets.</li>
