@@ -2,7 +2,7 @@
 
 Dear Students, welcome to the course repository, where you will find all informations supplementing this terms machine learning curse.
 
-## Notebooks
+## <slides & Notebooks
 
 * [ML1: Introduction to ML](https://raw.githack.com/daniel-hain/ML_course_2020_maastricht/master/notebooks/ML1_intro.html)
 * [ML2: ML workflow and cases](https://raw.githack.com/daniel-hain/ML_course_2020_maastricht/master/notebooks/ML2_cases.html)
@@ -11,13 +11,13 @@ Note: In the [Notebooks](https://github.com/daniel-hain/ML_course_2020_maastrich
 
 ## Videos
 
-Coming soon...
+### ML1: Introduction to ML
 
-ML1: Introduction to ML
 * [Part 1](https://aau.panopto.nordu.net/Panopto/Pages/Viewer.aspx?id=2238897d-9cf8-4aa2-b48a-aba7014d2e73)
 * [Part 2](https://aau.panopto.nordu.net/Panopto/Pages/Viewer.aspx?id=b78d90d8-ab9c-48dc-b754-aba7015b623d)
 
-ML2: ML workflow and cases
+###ML2: ML workflow and cases
+
 * coming soon...
 
 ## RStudioCloud Workspace
