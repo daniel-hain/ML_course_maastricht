@@ -18,7 +18,8 @@ Note: In the [Notebooks](https://github.com/daniel-hain/ML_course_2020_maastrich
 
 ### ML2: ML workflow and cases
 
-* coming soon...
+* [Part 1](https://aau.panopto.nordu.net/Panopto/Pages/Viewer.aspx?id=d5535a62-f03b-405b-9312-aba800b6e617)
+* [Part 2](https://aau.panopto.nordu.net/Panopto/Pages/Viewer.aspx?id=839e4fe2-d581-4261-b558-aba800c5570b)
 
 ## RStudioCloud Workspace
 
