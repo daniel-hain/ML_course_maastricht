@@ -44,6 +44,30 @@ Welcome all to this introduction to machine learning (ML). In this session we co
 3. Out-of-sample testing and cross-validation workflows
 4. Implementing Ml workflows with the `tidymodels` ecosystem.
 
+# Introduction to ML workflows in R
+
+![](https://www.dropbox.com/s/t9g6xjjl2jv6pfq/ml_tidymodels_workflow_large.png?dl=1)
+
+Remeber, the steps in the ML workflow are:
+
+1. Obtaining data
+2. Cleaning and inspecting 
+3. Visualizing and exploring data
+
+4. Preprocessing data
+5. Fiting and tuning models
+6. Validating models
+
+7. Communicating insights
+
+While step 1-3 is mainly covered by the general `tidyverse` packages such as `dplyr` and `ggplot2`, step 7 can be done using for instance `rmarkdown` (like me here) or developing an intractive `shiny` application. We will touch upon that, but the main focus here lies in the steps 5-6, the core of ML work.
+
+These steps are mainly covered by the packages to be found in the [`tidymodels`](https://www.tidymodels.org/) ecosystem, which take care of sampling, fitting, tuning, and evaluating models and data.
+
+![](https://www.dropbox.com/s/t7h1ml3h50nq23x/ml_tidymodels_flow.png?dl=1)
+
+Lets get started!
+
 # ML case 1 (Regression, tabular data): Boston Housing Prices
 
 ## Data Description
