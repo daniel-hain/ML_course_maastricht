@@ -36,6 +36,7 @@ Note: This project might still get updated. So feel free to play around, but the
 
 ### Datascience in R
 
+* [Social Data Science (me @ AAU)](https://github.com/SDS-AAU)
 * [R for Data Science (Hadley)](https://r4ds.had.co.nz/)
 * [Introduction to Data Science (Rafael A. Irizarry)](https://rafalab.github.io/dsbook/)
 * [Stats 432: R for Statistical Learning (UI)](https://daviddalpiaz.github.io/r4sl/)
