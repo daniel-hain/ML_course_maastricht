@@ -26,3 +26,29 @@ Note: In the [Notebooks](https://github.com/daniel-hain/ML_course_2020_maastrich
 * [My ML workshop workspace](https://rstudio.cloud/spaces/58457/join?access_code=upXQB7ijTMKiV7lDpS7Inn3C36BFnG%2Fa0J5PbpcG): Here you will find a project titled 'ML course 2020 Maastricht', where you will find all material to run in the RStudioCloud.
 
 Note: This project might still get updated. So feel free to play around, but the copy you make of it might be in need of update next week.
+
+## Tutorials & Knowledge
+
+### general 
+
+* [Fundamentals of Data Visualization (O'Reily)](https://serialmentor.com/dataviz/)
+* [Feature Engineering and Selection: A Practical Approach for Predictive Models (Max Kuhn)](https://bookdown.org/max/FES/)
+
+### Datascience in R
+
+* [R for Data Science (Hadley)](https://r4ds.had.co.nz/)
+* [Introduction to Data Science (Rafael A. Irizarry)](https://rafalab.github.io/dsbook/)
+* [Stats 432: R for Statistical Learning (UI)](https://daviddalpiaz.github.io/r4sl/)
+* [Stats 545: Data wrangling, exploration, and analysis with R (UBC)](https://stat545.com/)
+* [Forecasting in R: Principles and Practice](https://otexts.com/fpp2/)
+* [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+* [Efficient R Programming](https://csgillespie.github.io/efficientR/)
+* [Functional Programming in R (Stanford, Hadley)](https://dcl-prog.stanford.edu/)
+* [Data Visualization (R): A practical introduction](https://socviz.co/index.html)
+* [Exploring Enterprise Databases with R](https://smithjd.github.io/sql-pet/)
+
+
+### Tools & Notebooks
+* `.rmd` to `ipynb` converter [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M1-2019/blob/master/notebooks/converter_rmd_to_jupyter.ipynb#offline=true&sandboxMode=true)
+* [`ipynb`to `pdf` converter](https://htmtopdf.herokuapp.com/ipynbviewer/)
+
