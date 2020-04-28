@@ -6,6 +6,7 @@ Dear Students, welcome to the course repository, where you will find all informa
 
 * [ML1: Introduction to ML](https://raw.githack.com/daniel-hain/ML_course_2020_maastricht/master/notebooks/ML1_intro.html)
 * [ML2: ML workflow and cases](https://raw.githack.com/daniel-hain/ML_course_2020_maastricht/master/notebooks/ML2_cases.html)
+* [ML3 (live): Technology Cases & NLP](https://raw.githack.com/daniel-hain/ML_course_2020_maastricht/master/notebooks/ML3_cases_technology.html)
 
 Note: In the [Notebooks](https://github.com/daniel-hain/ML_course_2020_maastricht/tree/master/notebooks) folder, also all `.Rmd` files I used to create the html files are acessible.
 
@@ -54,9 +55,3 @@ Note: This project might still get updated. So feel free to play around, but the
 * [Functional Programming in R (Stanford, Hadley)](https://dcl-prog.stanford.edu/)
 * [Data Visualization (R): A practical introduction](https://socviz.co/index.html)
 * [Exploring Enterprise Databases with R](https://smithjd.github.io/sql-pet/)
-
-
-### Tools & Notebooks
-* `.rmd` to `ipynb` converter [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M1-2019/blob/master/notebooks/converter_rmd_to_jupyter.ipynb#offline=true&sandboxMode=true)
-* [`ipynb`to `pdf` converter](https://htmtopdf.herokuapp.com/ipynbviewer/)
-
