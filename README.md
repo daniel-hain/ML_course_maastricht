@@ -55,9 +55,3 @@ Note: This project might still get updated. So feel free to play around, but the
 * [Functional Programming in R (Stanford, Hadley)](https://dcl-prog.stanford.edu/)
 * [Data Visualization (R): A practical introduction](https://socviz.co/index.html)
 * [Exploring Enterprise Databases with R](https://smithjd.github.io/sql-pet/)
-
-
-### Tools & Notebooks
-* `.rmd` to `ipynb` converter [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M1-2019/blob/master/notebooks/converter_rmd_to_jupyter.ipynb#offline=true&sandboxMode=true)
-* [`ipynb`to `pdf` converter](https://htmtopdf.herokuapp.com/ipynbviewer/)
-
