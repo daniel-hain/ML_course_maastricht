@@ -1,0 +1,233 @@
+---
+title: 'Machine Learning: Exercises 1'
+author: "Your Name"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+### Install packages if necessary
+if (!require("pacman")) install.packages("pacman") # package for loading and checking packages :)
+pacman::p_load(tidyverse, magrittr, 
+               tidymodels
+               )
+```
+
+# Introduction
+
+Its time tnow to show what you can do and practiced what you learned. Your task will be the prediction of wine quality according to its chemical composition. You will master the following tasks:
+
+1. Inspect and visualize the data
+2. Split the data into a training and test sample.
+3. Carry out some preprocessing.
+4. Define a set of models to fit.
+5. Perform a hyperparameter tuning.
+6. Evaluate the model performance and select your final model.
+7. Evaluate the model performance on the test set.
+
+I lready prepared some code for you, but everywhere where you encounter `xx`, you have to fill acccordingly.
+
+Lets get started!
+
+# Data
+
+This dataset deals with wine quality, and includes ca 1.5k datapoints with wine quality ratings, and a chemical analysis of the corresponding wine. It can be found [here](http://archive.ics.uci.edu/ml/datasets/Wine+Quality).
+
+* P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis. Modeling wine preferences by data mining from physicochemical properties. In Decision Support Systems, Elsevier, 47(4):547-553, 2009.
+
+
+# Data loading and inspection
+Load the Wine dataset and check a bit
+
+```{r}
+data <- read_csv("https://www.dropbox.com/s/mcs7kpyox7a5e61/wine_quality.csv?dl=1")
+```
+
+Lets see what I got for you.
+
+```{r}
+data %>% head()
+```
+
+```{r}
+data %>% glimpse()
+```
+
+```{r}
+data %>% skimr::skim()
+```
+
+As we see, all variables are numeric. Your aim is to predict the `quality` variable based on all other available variables. This will therefore be a regression exercise.
+
+According to our standard workflow, lets define the outcome varible as `y`. By the way, is there a variable we would like to deselect?
+
+```{r}
+data %<>%
+  rename(y = xx) %>%
+  select(-xx)
+```
+
+We could also briefly explore th data visually. Is there a function from the `GGally` package that comes to your mind to help you there?
+
+```{r}
+data %>%
+  GGally::xxx
+```
+
+
+# Train & test split
+
+Lets split the data into 80% train and 20% test sample.
+
+```{r}
+data_split <- data %>% xx(prop = xx)
+
+data_train <- data_split  %>%  xx()
+data_test <- data_split %>% xx()
+```
+
+# Preprocessing
+
+The data is fairly clean and simle. However, does a useful preprocessing step come to your mind here?
+
+```{r}
+data_recipe <- data_train %>%
+  recipe(y ~.) %>%
+  step_xx(all_numeric(), -all_outcomes()) %>% # Centers all numeric variables to mean = 0
+  step_xx(all_numeric(), -all_outcomes()) %>% # scales all numeric variables to sd = 1
+  prep()
+```
+
+# Define the models
+
+We will set up 2 models:
+
+1. A simple linear regression
+2. A more complex and tunable random forest.
+
+Lets first define the linear model
+
+```{r}
+model_lm <- xx(mode = 'regression') %>%
+  set_engine('xx') 
+```
+
+And now the random forest. We would like to fit a model with 100 `trees`, where `mtry` and `min_n` should be tunable hyperparameters to be optimized later.
+
+```{r}
+model_rf <- xx(mode = 'regression',
+                        trees = xx,
+                        mtry = xx,
+                        min_n = xx
+                        ) %>%
+  set_engine('xx', importance = 'impurity') 
+```
+
+# Define the workflow
+
+We now set up the workflow
+
+```{r}
+workflow_general <- workflow() %>%
+  add_xx(data_recipe) 
+
+workflow_lm <- workflow_general %>%
+  add_xx(model_lm)
+
+workflow_rf <- workflow_general %>%
+  add_xx(model_rf)
+```
+
+# Hyperparameter tuning
+
+We now define the resample. We would like to use 3 bootspraps samples from the training data
+
+```{r}
+data_resample <- xx %>% bootstraps(times = xx)
+```
+
+Here, we only have the random forest to tune. 
+
+```{r}
+tune_rf <- workflow_rf %>%
+  tune_xx(
+    resamples = xx,
+    grid = 10
+  )
+```
+
+Lets see how that worked out:
+
+```{r}
+tune_rf %>% autoplot()
+```
+
+We now extract the best hyperparameter setup.
+
+```{r}
+best_param_rf <- tune_rf %>% xx(metric = 'xx')
+```
+
+# Model fitting
+
+We now update our workflow with the identified parameters...
+
+```{r}
+workflow_final_rf <- workflow_rf %>%
+  xx(parameters = xx)
+```
+
+ ...and fit the final models.
+ 
+```{r}
+fit_lm <- workflow_xx %>%
+  fit(xx)
+
+fit_rf <- workflow_xx %>%
+  fit(xx)
+```
+
+
+# Compare performance
+
+Lets see which model did better, the simple or the complex one...
+
+```{r}
+pred_collected <- tibble(
+  truth = data_train %>% pull(y),
+  base = mean(truth),
+  lm = fit_lm %>% predict(new_data = xx) %>% pull(xx),
+  rf = fit_rf %>% predict(new_data = xx) %>% pull(xx),
+  ) %>% 
+  pivot_longer(cols = -truth,
+               names_to = 'model',
+               values_to = '.pred')
+```
+
+And the winner is
+
+```{r}
+pred_collected %>%
+  group_by(model) %>%
+  rmse(truth = xx, estimate = xx) %>%
+  select(model, .estimate) %>%
+  arrange(.estimate)
+```
+
+You could also visualize the results. Do whatever you want here.
+
+```{r}
+# Try something
+```
+
+# Final prediction
+
+Lets pick the better model and evaluate it on the test data
+
+```{r}
+fit_last_xx <- workflow_final_xx %>% last_fit(split = xx)
+```
+
+LAstly, could you tell me which variables seems to be (according to the winning model) overall most important for wine quality?
+
+
