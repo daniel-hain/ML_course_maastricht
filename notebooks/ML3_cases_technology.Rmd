@@ -1,0 +1,358 @@
+---
+title: 'Machine Learning: Applications in technology Analysis 1'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+### Generic preamble
+rm(list=ls())
+Sys.setenv(LANG = "en") # For english language
+options(scipen = 5) # To deactivate annoying scientific number notation
+set.seed(1337) # To have a seed defined for reproducability
+
+### Knitr options
+library(knitr) # For display of the markdown
+knitr::opts_chunk$set(warning=FALSE,
+                     message=FALSE,
+                     fig.align="center"
+                     )
+
+### Install packages if necessary
+if (!require("pacman")) install.packages("pacman") # package for loading and checking packages :)
+```
+
+```{r}
+### Install and oad packages if necessary
+pacman::p_load(tidyverse, magrittr, 
+               tidymodels
+               )
+```
+
+
+Welcome to todays session.
+
+# Introduction
+
+
+# Exploring Chinese Patent Data
+
+## Introduction
+
+So, let's start the fun. I for you extracted Chinese patents from our EPO [PATSTAT](https://www.epo.org/searching-for-patents/business/patstat.html) databases filed at either the EPO or the USTPO. I further provide you adittional data. 
+
+```{r}
+patents <- readRDS("../data/CN_patent.rds")
+pat_abstr <- readRDS("../data/CN_el_patent_abstract.rds")
+pat_cpc <- readRDS("../data/CN_el_cpc.rds")
+```
+
+Lets take a look:
+
+```{r}
+patents %<>% filter(appln_filing_year >= 2013)
+```
+
+```{r}
+pat_abstr %<>% semi_join(patents, by = 'appln_id')
+pat_cpc %<>% semi_join(patents, by = 'appln_id')
+```
+
+
+## Patent main data
+
+```{r}
+patents %>% head()
+```
+
+```{r}
+patents %>% glimpse()
+```
+
+This main dataset contains all Patents in the 2000-2015 period with Chinese inventors, filed at the USTPO or EPO. I only included priority (earliest) patent applications which got granted up to now. We have the following variables:
+
+* `appln_id`: PATSTAT id, unique identifier of patent application
+* `appln_filing_year`: Filing year of first priority
+* `docdb_family_size`: Size of the (simple) patent family
+* `nb_citing_docdb_fam`: Number of citations recieved by the patent family
+* `nb_inventors`: Number of inventors
+
+```{r}
+patents %>% skimr::skim()
+```
+
+## Patent CPC Class
+
+```{r}
+pat_cpc %>% glimpse()
+```
+
+```{r}
+pat_cpc %>% head()
+```
+
+```{r}
+pat_cpc %>% 
+  count(cpc_class_symbol, sort = TRUE) %>%
+  head()
+```
+
+## Patent Abstracts
+
+```{r}
+pat_abstr %>% glimpse()
+```
+
+```{r}
+pat_abstr %>% select(-appln_id) %>% head()
+```
+
+# The Y Tag: How to identify renewable energy patents
+
+We now aim at identifying renewable energy patents. This could be the starting point for an interesting analysis on all kind of things, but we here went to ask the following question: 
+
+1. Could we develop a model that detects renewable energy patents based on their abstract?
+
+Here, we exploit the WIPOs Y-tag. Here, the WIPO labels patents identified to be related to renewable energy with the adittional CPC class assignment `Y02` which helps us to easily identify them. Check [here](https://www.gonst.lu.se/article/report-on-green-patents) for further information.
+
+Lets identify renewable energy patents.
+
+```{r}
+y_tag <- pat_cpc %>%
+  filter(cpc_class_symbol %>% str_starts('Y02')) %>%
+  distinct(appln_id) %>%
+  pull()
+```
+
+```{r}
+patents %<>%
+  mutate(y_tag = appln_id %in% y_tag)
+```
+
+```{r}
+patents %>% head()
+```
+
+```{r}
+rm(pat_cpc)
+```
+
+
+# Text analysis of patent data
+
+## The R NLP ecosystem 
+
+Most language analysis approaches are based on the analysis of texts word-by-word. Here, their order might matter (word sequence models) or not (bag-of-words models), but the smallest unit of analysis is usually the word. This is usually done in context of the document the word appeared in. Therefore, on first glance three types datastructures make sense:
+
+1. **Tidy:**  Approach, where data is served in a 2-column document-word format (e.g., `tidytext`)
+2. **Token lists:** Creation of special objects, saved as document-token lists or corpus (e.g., `tm`, `quanteda`)
+3. **Matrix:** Long approach, where data is served as document-term matrix, term-frequency matrix, etc.
+
+Different forms of analysis (and the packages used therefore) favor different structures, so we need to be fluent in transfering original raw-text in these formats, as well as switching between them. (for more infos, check [here](https://www.tidytextmining.com/dtm.html)).
+
+![](https://www.dropbox.com/s/ou05c8np4j47r0q/nlp_tidyworkflow.png?dl=1)
+
+```{r}
+library(tidytext)
+```
+
+## Tidy Text Formats
+
+```{r}
+pat_abstr %<>%
+  left_join(patents %>% select(appln_id, y_tag), by = "appln_id")
+```
+
+
+
+```{r}
+pat_abstr_tidy <- pat_abstr %>%
+  select(appln_id, y_tag, appln_abstract) %>%
+  unnest_tokens(output = word, 
+                input = appln_abstract, 
+                token = "words",
+                to_lower = TRUE,
+                drop = TRUE)
+```
+
+
+```{r}
+pat_abstr_tidy %>%
+  head()
+```
+
+```{r}
+ pat_abstr_tidy %<>%
+  mutate(word = word %>% str_remove_all('[^[:alnum:]]')) %>%
+  filter(str_length(word) > 2 ) %>%
+  group_by(word) %>%
+  filter(n() > 100) %>%
+  ungroup() %>%
+  anti_join(get_stopwords()) 
+```
+
+```{r}
+pat_abstr_tidy %<>%
+  add_count(appln_id, word) %>%
+  bind_tf_idf(term = word,
+              document = appln_id,
+              n = n)
+```
+
+```{r}
+pat_abstr_tidy %>%
+  head()
+```
+
+```{r}
+pat_abstr_tidy %>%
+  count(word, wt = tf_idf) %>%
+  top_n(n, 20)
+```
+
+```{r}
+pat_ytag_words <- pat_abstr_tidy %>%
+  group_by(y_tag) %>%
+  count(word, wt = tf_idf, sort = TRUE, name = "tf_idf") %>%
+  slice(1:20) %>%
+  ungroup() %>%
+  mutate(word = reorder_within(word, by = tf_idf, within = y_tag)) 
+```
+
+```{r}
+pat_ytag_words %>%
+  ggplot(aes(x = word, y = tf_idf, fill = y_tag)) +
+  geom_col(show.legend = FALSE) +
+  labs(x = NULL, y = "tf-idf") +
+  facet_wrap(~y_tag, ncol = 2, scales = "free") +
+  coord_flip() +
+  scale_x_reordered()
+```
+
+# Building a predictive model
+
+We see there seems to be quite a difference in the words used in Y-tagged renewable energy patents. Therefore it indeed might be possible to 
+
+```{r}
+data <- pat_abstr %>%
+  select(y_tag, appln_abstract) %>%
+  rename(y = y_tag, text = appln_abstract) %>%
+  mutate(y = y %>% as_factor()) %>%
+  mutate(text = text %>% str_to_lower() %>% str_remove_all('[^[:alnum:] ]'))
+```
+
+
+## Training & Test split
+
+```{r}
+data_split <- initial_split(data, prop = 0.75, strata = y)
+
+data_train <- data_split  %>%  training()
+data_test <- data_split %>% testing()
+```
+
+## Preprocessing pipeline
+
+```{r}
+library(textrecipes)
+```
+
+```{r}
+data_recipe <- data_train %>%
+  recipe(y ~.) %>%
+  step_downsample(y) %>%
+  step_filter(text != "") %>%
+  step_tokenize(text) %>%
+  step_tokenfilter(text, min_times = 100) %>%  
+  step_stopwords(text, keep = FALSE) %>%
+  step_tfidf(text) %>%
+  prep()
+```
+
+```{r}
+data_recipe
+```
+
+```{r}
+data_train_prep <- data_recipe %>% juice()
+data_test_prep <- data_recipe %>% bake(data_test)
+```
+
+
+## Defining the models
+
+```{r}
+all_cores <- parallel::detectCores(logical = FALSE)
+
+library(doParallel)
+cl <- makePSOCKcluster(all_cores)
+registerDoParallel(cl)
+```
+
+
+```{r}
+model_en <- logistic_reg(mode = 'classification', 
+                         mixture = 0.0, 
+                         penalty = 0.25) %>%
+  set_engine('glm', family = binomial) 
+```
+
+
+## Define the workflow
+
+We will skip the workflow step this time, since we do not evaluate different models against each others.
+
+## fit the model
+
+```{r}
+fit_en <- model_en %>% fit(formula = y ~., data = data_train_prep)
+```
+
+
+```{r}
+pred_collected <- tibble(
+  truth = data_train_prep %>% pull(y),
+  pred = fit_en %>% predict(new_data = data_train_prep) %>% pull(.pred_class),
+  pred_prob = fit_en %>% predict(new_data = data_train_prep, type = "prob") %>% pull(.pred_TRUE),
+  ) 
+```
+
+```{r}
+pred_collected %>% conf_mat(truth, pred)
+```
+
+```{r}
+pred_collected %>% conf_mat(truth, pred) %>% summary()
+```
+
+
+
+
+# Endnotes
+
+### References
+
+* [Hain, D., & Jurowetzki, R. (2020). Introduction to Rare-Event Predictive Modeling for Inferential Statisticians--A Hands-On Application in the Prediction of Breakthrough Patents. arXiv preprint arXiv:2003.13441.](https://arxiv.org/abs/2003.13441)
+
+### Packages and Ecosystem
+
+* [`tidymodels`](https://www.tidymodels.org/): Tidy statistical and predictive modeling ecosystem
+* [`tidytext`]
+
+### Further Readings
+
+* [`Tidy Text Mining in R`](https://www.tidytextmining.com/)
+
+### Session info
+```{r}
+sessionInfo()
+```
