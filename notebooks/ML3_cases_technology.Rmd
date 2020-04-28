@@ -39,10 +39,7 @@ pacman::p_load(tidyverse, magrittr,
 ```
 
 
-Welcome to todays session.
-
-# Introduction
-
+Welcome to todays session. 
 
 # Exploring Chinese Patent Data
 
@@ -116,6 +113,13 @@ pat_abstr %>% glimpse()
 pat_abstr %>% select(-appln_id) %>% head()
 ```
 
+# Exploratory Analysis
+
+We could have so much fun here exploring Chinese patents, but we have no time. However, I do another more exploratory lecture on the ame dataset, feel free to check:
+
+* [Economic Geography & Patents](https://rawcdn.githack.com/daniel-hain/SDC_IM/b6c6d65bc4128cb9f09f6e84476bec8f4be649a5/S3_1_Economic_geography.html)
+* [Economic Complexity & Patents]https://rawcdn.githack.com/daniel-hain/SDC_IM/9bf8683ffeea703e50e5506ac0eb3dd7544621c3/S3_2_Economic_complexity.html
+
 # The Y Tag: How to identify renewable energy patents
 
 We now aim at identifying renewable energy patents. This could be the starting point for an interesting analysis on all kind of things, but we here went to ask the following question: 
@@ -171,7 +175,6 @@ library(tidytext)
 pat_abstr %<>%
   left_join(patents %>% select(appln_id, y_tag), by = "appln_id")
 ```
-
 
 
 ```{r}
@@ -333,8 +336,6 @@ pred_collected %>% conf_mat(truth, pred)
 ```{r}
 pred_collected %>% conf_mat(truth, pred) %>% summary()
 ```
-
-
 
 
 # Endnotes

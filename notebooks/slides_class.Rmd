@@ -29,6 +29,23 @@ if (!require("pacman")) install.packages("pacman") # package for loading and che
 
 # What we did so far
 
-# Q1: How can ML methods be useful for policy Analysis?
+## Summing up
 
-# Q2: 
+1. Understand the core ideas behind ML & predictive modeling
+2. Understand how we fit predictive models
+3. Understand ML workflows
+4. Understand how to establish generalization in ML models
+
+## Today we will
+
+1. Reflext on the exercises so far.
+2. Look into another case (tech & NLP)
+3. Have some own exercises
+
+# Q0: What questions came up so far?
+
+# Q1: How can ML methods be useful for Policy Analysis?
+
+# Q2: How will ML & AI methods impact
+
+# Q3: What cases/tasks are appropriate for using ML models?
