@@ -6,6 +6,7 @@ Dear Students, welcome to the course repository, where you will find all informa
 
 * [ML1: Introduction to ML](https://raw.githack.com/daniel-hain/ML_course_2020_maastricht/master/notebooks/ML1_intro.html)
 * [ML2: ML workflow and cases](https://raw.githack.com/daniel-hain/ML_course_2020_maastricht/master/notebooks/ML2_cases.html)
+* [ML3 (live): Technology Cases & NLP](https://raw.githack.com/daniel-hain/ML_course_2020_maastricht/master/notebooks/ML3_cases_technology.html)
 
 Note: In the [Notebooks](https://github.com/daniel-hain/ML_course_2020_maastricht/tree/master/notebooks) folder, also all `.Rmd` files I used to create the html files are acessible.
 
