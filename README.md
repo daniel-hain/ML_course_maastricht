@@ -31,6 +31,9 @@ Note: This project might still get updated. So feel free to play around, but the
 ## Exercises
 
 * [ML exercise 1](https://github.com/daniel-hain/ML_course_2020_maastricht/blob/master/notebooks/ML_ex1.Rmd): Please solve this exercise **before** our class. It requires not a lot of work, but will ensure you can replicate the general ML workflows in predictive modeling. I guess it will take you **less than 30 minutes**. It is also to be found in your RStudioCloud project `notebook` folder.
+* [ML exercise 2 (NLP)](https://github.com/daniel-hain/ML_course_2020_maastricht/blob/master/notebooks/ML_ex2.Rmd): A bonus in case you wnt to test you skills from the sessio **after** our class. It is also to be found in your RStudioCloud project `notebook` folder.
+
+
 
 
 # Further Resources
