@@ -5,11 +5,10 @@ Dear Students, welcome to the course repository, where you will find all informa
 ## Bonus: R Brush-up
 
 ## Introduction to the Data Science Ecosystem
-* The Data Science Ecosystem: R [Video](https://www.loom.com/share/9546d7efda6e42dbac378f77cdda1017) [Slides](https://docs.google.com/presentation/d/18zDe2rYWGDOmU-yd_K0VidzxUwe6UznqymHTUSfAwEQ/edit?usp=sharing)
-* Application: Basics of statistical programming in R 
-   * [Video](https://www.loom.com/share/8bb0ed1ce1f244b39243cbbdca8726ed) 
-   * [Html](https://sds-aau.github.io/SDS-master/M1/notebooks/DS_basics_basics_R.nb.html) 
-   * [Colab](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/DS_basics_basics_R.ipynb#offline=true&sandboxMode=true)
+* Theory: The Data Science Ecosystem: R 
+[--> Video <--](https://www.loom.com/share/9546d7efda6e42dbac378f77cdda1017) 
+[--> Slides <--](https://docs.google.com/presentation/d/18zDe2rYWGDOmU-yd_K0VidzxUwe6UznqymHTUSfAwEQ/edit?usp=sharing)
+* Application: Basics of statistical programming in R [--> Video <--](https://www.loom.com/share/8bb0ed1ce1f244b39243cbbdca8726ed) [-->Html](https://sds-aau.github.io/SDS-master/M1/notebooks/DS_basics_basics_R.nb.html) [Colab](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/DS_basics_basics_R.ipynb#offline=true&sandboxMode=true)
 * Theory: Introduction to data [Video](https://www.loom.com/share/b7d14023383643b2b1dce248ed28ee68) [Slides](https://sds-aau.github.io/SDS-master/M1/notebooks/DS_basics_data.html)
 
 ## Data Manipulation & Exploration 
