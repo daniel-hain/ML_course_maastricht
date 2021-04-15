@@ -2,6 +2,38 @@
 
 Dear Students, welcome to the course repository, where you will find all informations supplementing this terms machine learning course.
 
+
+# Part I: Data Manipulation & Exploration
+
+## Introduction to the Data Science Ecosystem
+* Theory: The Data Science Ecosystem: R [Video](https://www.loom.com/share/9546d7efda6e42dbac378f77cdda1017) [Slides](https://docs.google.com/presentation/d/18zDe2rYWGDOmU-yd_K0VidzxUwe6UznqymHTUSfAwEQ/edit?usp=sharing)
+
+## Data Science Basics
+* Application: Basics of statistical programming
+   * R [Video](https://www.loom.com/share/8bb0ed1ce1f244b39243cbbdca8726ed) [Html](https://sds-aau.github.io/SDS-master/M1/notebooks/DS_basics_basics_R.nb.html) [Colab](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/DS_basics_basics_R.ipynb#offline=true&sandboxMode=true)
+* Theory: Introduction to data [Video](https://www.loom.com/share/b7d14023383643b2b1dce248ed28ee68) [Slides](https://sds-aau.github.io/SDS-master/M1/notebooks/DS_basics_data.html)
+
+## Data Manipulation & Exploration 
+* Theory: Data manipulation basics [Video](https://www.loom.com/share/394d083071fc42219f5921fb394b3e6c) [Slides](https://sds-aau.github.io/SDS-master/M1/notebooks/DS_basics_data_manipulation.html)
+* Application: R [Video](https://www.loom.com/share/06497181712a4fbf9bf4443d85926a35) [Html](https://sds-aau.github.io/SDS-master/M1/notebooks/DS_basics_data_manipulation_application_R.nb.html) [Colab](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/DS_basics_data_manipulation_application_R.ipynb#offline=true&sandboxMode=true)
+     * Exercise R: [1: Basics](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/exercises/DS_basics_data_manipulation_application_R_ex1.ipynb) [2: Joins](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/exercises/DS_basics_data_manipulation_application_R_ex2.ipynb) [3: Challange](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/exercises/DS_basics_data_manipulation_application_R_ex3.ipynb)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Slides & Notebooks
 
 * [ML1: Introduction to ML](https://raw.githack.com/daniel-hain/ML_course_2020_maastricht/master/notebooks/ML1_intro.html)
