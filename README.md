@@ -6,7 +6,7 @@ Dear Students, welcome to the course repository, where you will find all informa
 # Part I: Data Manipulation & Exploration
 
 ## Introduction to the Data Science Ecosystem
-* Theory: The Data Science Ecosystem: R [Video](https://www.loom.com/share/9546d7efda6e42dbac378f77cdda1017) [Slides](https://docs.google.com/presentation/d/18zDe2rYWGDOmU-yd_K0VidzxUwe6UznqymHTUSfAwEQ/edit?usp=sharing)
+* The Data Science Ecosystem: R [Video](https://www.loom.com/share/9546d7efda6e42dbac378f77cdda1017) [Slides](https://docs.google.com/presentation/d/18zDe2rYWGDOmU-yd_K0VidzxUwe6UznqymHTUSfAwEQ/edit?usp=sharing)
 
 ## Data Science Basics
 * Application: Basics of statistical programming
