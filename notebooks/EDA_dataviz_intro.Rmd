@@ -1,0 +1,433 @@
+---
+title: 'Introduction to Data Visualization'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  ioslides_presentation:
+#    css: '../../00_notebooks/css_style_ioslides.css'
+   
+---
+
+```{r setup, include=FALSE}
+# Knitr options
+knitr::opts_chunk$set(
+  echo = FALSE
+  )
+
+# Load packages
+library(tidyverse)
+library(magrittr)
+library(knitr)
+library(kableExtra)
+```
+
+
+<style type="text/css">
+  .img_small{
+    width: 50%;
+  }
+.img{
+  width: 75%;
+}
+.img_big{
+  width: 100%;
+}
+</style>
+
+## This session 
+
+In this session you will be introduced to: 
+
+1. The purpose of data visualization
+2. A framework of elements of data visualization
+3. Basic types of visualization
+4. How to choose the right visualization depending on:
+   * Variable type
+   * Amount of variables
+   * Types of properties/relationships to be highlighted
+
+# Introduction to Visualization
+
+## DataViz
+
+<center>
+*"The mapping of variable values/properties in the data to visually comprehensible graphical elements/positions"* 
+</center>
+Daniel
+
+
+Purpose of Visualization
+
+* Explore properties of the data
+* Reveal insights to be found in the data
+* Create data-narratives
+* ...
+
+## DataViz matters
+
+Q: What is wrong with this data visualization?
+
+<center>
+![](https://sds-aau.github.io/SDS-master/00_media/dataviz_bad.png){.img}
+</center>
+
+# A Data Visualization Framework
+
+## The DataViz framework
+
+<center>
+![](https://sds-aau.github.io/SDS-master/00_media/dataviz_framework.png){.img_big}
+</center>
+
+Borner, K. (2015). [Atlas of knowledge: Anyone can map](http://scimaps.org/atlas2) MIT Press.
+
+## 1. Insights needed
+
+Q1: What insight do I want to gain/communicate with this visualization?
+
+* Distribution?
+* Composition?
+* Cluster?
+* Trends (over time)?
+* Position in space?
+* Correlation, relationships?
+* Statistical properties?
+
+
+## 2. Data Scales
+
+<center>
+![](https://sds-aau.github.io/SDS-master/00_media/dataviz_scales.png){.img_big}
+</center>
+
+Different scales....
+
+* ... allow to ask different questions
+* ... require different means of presentation
+
+## 3. Analysis type
+
+Often, we do not only look at raw data, but aim at visualizing result of an analysis. Again, different analysis offer/require different forms of visualization.
+
+* When: Temporal Analysis / Timeseries
+* Where: Geospatial Analysis
+* What: Topical Data Analysis
+* Why: Inferential Statistics
+* With whom: Network Analysis
+
+
+## 4. Visualization: Types
+
+<center>
+![](https://sds-aau.github.io/SDS-master/00_media/dataviz_types.png){.img_big}
+</center>
+
+## 4. Reference System
+
+<center>
+![](https://sds-aau.github.io/SDS-master/00_media/dataviz_reference.png){.img_big}
+</center>
+
+* Often, the position in 2-dimensional space represent the first ways to map information in th data. 
+* We refer to this 2d mapping as the choice of reference system.
+
+## 5. Graphic Symbols
+
+```{r, fig.height=3, message=FALSE, warning=FALSE, comment=FALSE}
+library(ggpubr)
+library(patchwork)
+
+p1 <- show_point_shapes() +
+  labs(title=NULL)
+
+p2 <- show_line_types() +
+  labs(title=NULL)
+
+p <- p1 + p2
+p
+```
+
+The **shape** of elements plotted in the reference system represent another dimension to communicate (discrete) data properties. Eg.
+
+* Points
+* Lines
+* Linguistic symbols
+
+
+## 6. Graphic variables
+
+Graphical variables allow further dimensions to communicate (discrete or contineous) data properties
+
+<center>
+![](https://sds-aau.github.io/SDS-master/00_media/dataviz_variables.png){.img_big}
+</center>
+
+## Symbols & variables combined
+
+In combinations, shapes and variable mappings allow for multiple types of information expressed jointly.
+
+<center>
+![](https://sds-aau.github.io/SDS-master/00_media/dataviz_variables2.png){.img}
+</center>
+
+## 7. Interactions
+
+Interactive visualizations allow for:
+
+* communicating more dynamic and complex properties/relationships
+* Allow own insight-creation by exploration
+
+<center>
+![](https://sds-aau.github.io/SDS-master/00_media/dataviz_interactive.png){.img_small}
+</center>
+
+## Summary
+
+<center>
+![](https://sds-aau.github.io/SDS-master/00_media/dataviz_reference_joint.png){.img_big}
+</center>
+
+The combination of...
+
+* ... graphical symbols ...
+* ... other graphical variables ...
+* ... on a reference system...
+
+... allow us to represent a multitude of information to be found in the data or as result of an analysis visually.
+
+
+# Examples: Visualizing Variables & Relationships
+
+## Summaries of One Variable: Continuous{.smaller}
+
+Histogram for binned bars
+
+```{r,fig.height=2.5, message=FALSE, warning=FALSE, comment=FALSE}
+iris %>% ggplot(aes(x = Sepal.Length)) +
+  geom_histogram()
+```
+
+**Reference system:**
+
+* x = Variable value
+* y = Observation count
+* Symbol = Bar
+
+## Summaries of One Variable: Continuous {.smaller}
+
+Alternative: Probability density function (PDF) 
+
+```{r,fig.height=2.5, message=FALSE}
+iris %>% ggplot(aes(x = Sepal.Length)) +
+  geom_density()
+```
+
+**Reference system:**
+
+* x = Variable value
+* y = Observation count
+* Symbol = Line
+
+## Summaries of One Variable: Discrete{.smaller}
+
+Barplot
+
+```{r,fig.height=2.5, message=FALSE}
+iris  %>%
+  ggplot(aes(x = Species)) +
+  geom_bar()
+```
+**Reference system:**
+
+* x = Variable category
+* y = Observation count
+* Symbol = Bar
+
+
+## Summaries of One Variable: Discrete{.smaller}
+
+Barplot (stacked)
+
+```{r,fig.height=2.5, message=FALSE}
+iris  %>%
+  count(Species) %>%
+  ggplot(aes(x="", y=n, fill=Species)) +
+  geom_bar(width = 1, stat = "identity") +
+  labs(x = NULL, y = NULL)
+
+```
+**Reference system:**
+
+* y = Observation count
+* Symbol = Bar
+* Variable = Color
+
+## Summaries of One Variable: Discrete{.smaller}
+
+Pie Chart
+
+```{r,fig.height=2.5, message=FALSE}
+iris  %>%
+  count(Species) %>%
+  ggplot(aes(x="", y=n, fill=Species)) +
+  geom_bar(width = 1, stat = "identity") + 
+  coord_polar("y", start=0) +
+  labs(x = NULL, y = NULL)
+
+```
+**Reference system:**
+
+* y = Observation count
+* Symbol = Bar (polar coordinates)
+* Variable = Color
+
+## Summarizing multiple variables jointly
+
+Scatterplot (2 variables)
+
+```{r,fig.height=2.5, message=FALSE}
+iris  %>%
+  ggplot(aes(x=Sepal.Width, y=Sepal.Length)) +
+  geom_point()
+```
+**Reference system:**
+
+* y = Value Variable y
+* x = Value variable x
+* Symbol = Point
+
+## Summarizing multiple variables jointly
+
+Scatterplot (3 variables, 2c1d)
+
+```{r,fig.height=2.5, message=FALSE}
+iris  %>%
+  ggplot(aes(x=Sepal.Width, y=Sepal.Length, col=Species)) +
+  geom_point()
+```
+**Reference system:**
+
+* y = Value Variable y
+* x = Value variable x
+* Symbol = Point
+* Variable: Color (Species)
+
+## Summarizing multiple variables jointly
+
+Scatterplot (3 variables, 3c)
+
+```{r,fig.height=2.5, message=FALSE}
+iris  %>%
+  ggplot(aes(x=Sepal.Width, y=Sepal.Length, col=Petal.Length)) +
+  geom_point()
+```
+**Reference system:**
+
+* y = Value Variable y
+* x = Value variable x
+* Symbol = Point
+* Variable: Color (Petal.Lenght)
+
+## Summarizing multiple variables jointly
+
+Scatterplot (4 variables, 3c,1d)
+
+```{r,fig.height=2.5, message=FALSE}
+iris  %>%
+  ggplot(aes(x=Sepal.Width, y=Sepal.Length, col=Petal.Length, shape=Species)) +
+  geom_point()
+```
+**Reference system:**
+
+* y = Value Variable y
+* x = Value variable x
+* Symbol = Point
+* Variable: Color (Petal.Lenght), Shape (Species)
+
+## Summarizing multiple variables jointly
+
+Facet Matrix (4 variables, 2c,1d)
+
+```{r,fig.height=2.5, message=FALSE}
+iris  %>%
+  ggplot(aes(x=Sepal.Width, y=Sepal.Length)) +
+  geom_point() + 
+  facet_grid(vars(Species))
+```
+**Reference system:**
+
+* y = Value Variable y
+* x = Value variable x
+* Y-Facet: Species
+
+## Statistical properties
+
+Boxplot (Univariate distribution of multiple variables)
+
+```{r,fig.height=2.5, message=FALSE}
+iris  %>%
+  select(-Species) %>%
+  pivot_longer(everything(), names_to = 'variable') %>%
+  ggplot(aes(x=variable, y=value)) +
+    geom_boxplot()
+```
+**Reference system:**
+
+* y = Value Variable 
+* x = Value variable x
+* Symbol = Confidence Interval Box
+
+
+## Statistical properties
+
+Correlation Matrix (bivariate distribution of multiple variables)
+
+```{r,fig.height=2.5, message=FALSE}
+library(GGally)
+iris  %>%
+  select(-Species) %>%
+  ggcorr(label = TRUE, label_size = 3, label_round = 2, label_alpha = TRUE)
+```
+**Reference system:**
+
+* y = Variable
+* x = Variable
+* Variable: Color (Correlation)
+
+
+## Statistical properties
+
+Correlation Matrix (bivariate distribution of multiple variables)
+
+```{r,fig.height=5, message=FALSE, warning=FALSE, comment=FALSE}
+library(GGally)
+iris  %>%
+  ggpairs(aes(alpha = 0.3), ggtheme = theme_gray()) 
+```
+
+
+
+## Interactions
+
+Examples ar manifold. Just to give you one:
+
+```{r, fig.height=5, message=FALSE, warning=FALSE, comment=FALSE}
+library(plotly)
+highlight_key(iris) %>%
+  ggpairs(aes(colour = Species), columns = 1:4) %>%
+  ggplotly(tooltip = c("x", "y", "colour")) %>%
+  highlight("plotly_selected")
+```
+
+# Summary
+
+## What we learned today
+
+* Data visualization is of high importance for data exploration, insight generation & communication
+* Depending on the purpose of th visualization, different types have to be chosen.
+* Variable characteristics influence the possibilities of visual mapping.
+* Depending on type & amount of relationships to be depicted, different visualization devices can b utulized.
+* Common mapping elements are: Reference position (x, y), color, shape, alpha, facet
+
+
+

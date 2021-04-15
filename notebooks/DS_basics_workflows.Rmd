@@ -1,0 +1,145 @@
+---
+title: 'Data Science Basics: The Data Science Workflow'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  ioslides_presentation:
+    css: '../../00_notebooks/css_style_ioslides.css'
+   
+---
+
+```{r setup, include=FALSE}
+# Knitr options
+knitr::opts_chunk$set(
+  echo = FALSE
+  )
+
+# Load packages
+library(tidyverse)
+library(magrittr)
+library(knitr)
+library(kableExtra)
+```
+
+<!-- CSS Definitions -->
+
+<!-- CSS Definitions -->
+
+## This session 
+
+In this session you will be introduced to: 
+
+1. xxx
+2. xxx
+
+# Introduction 
+
+## Data Science Workflows {.smaller}
+
+![](https://sds-aau.github.io/SDS-master/00_media/ds_workflow.png){.img_big}
+
+1. **Import** Transfer data from an external source (xls sheet, html page, API etc.) to a format suitable for your current environment.
+2. **Tidy:** Manipulating data structure in a consistent form that matches the semantics of the dataset.
+3. **Transform:** Computing/summrizing variables, subsetting, filtering, merging etc. (data wrangling)
+4. **EDA / Visualize:** Exploration of the properties of and relationships within the data with visualizations and simple statistics.
+5. **Model:** Use of mathematical/computational tools/algorithms to identify properties of data, relationships, mechanisms & predictions
+6. **Communicate:** Present results in a format suitable for the targeted audience.
+
+## 1: Data Import
+
+Objective:
+
+* Navigating through the vastness of data available on every given topic, including online and offline sources
+* Identifying the datasource (or combination of many) that suits best to answer your (research) question at hand
+* Retrieve and consolidate data from various sources to a dataformat suitable for your further workflow
+
+Skills Required:
+
+* Database Management: MySQL, PostgresSQL,MongoDB...
+* Querying relational and non-relational databases
+* Accessing data via Application Programming Interfaces (API)
+* Retrieving Unstructured Data: text, videos, audio files, documents
+* Distributed Storage (Advanced): Hadoops, Spark/Flink
+
+
+## Data tidying / cleaning / preprocessing
+So, we got all our data together. Yet, in most cases the really hard part begins. At the point where we can neathly run our Ml models, usually 80% of the job is done. Till then, Data has to go on a at times long and painful journey of missing value and outlier replacement, tidying, merging, mutating, aggregating and the like, just to emerge at its best.
+
+Objective:
+
+* Examine the data: understand every feature you're working with, identify errors, missing values, and corrupt records
+* Clean the data: drop, replace, and/or fill missing values/errors
+
+Skills Required:
+
+* Scripting language and corresponding packages: Python, R
+
+* Python Packages
+    * Pandas
+    * sklearn (can be used for imputation)
+    * fancyimpute (as the name suggests - implements various matrix completion algos)
+    * missingno (visualize missing/messy data)
+* R packages
+    * Dplyr (as always, for general replacement, mutation, grouping, aggregation, joins)
+    * anomalize: Tidy anomaly detection
+    * VIM, amelia, mi, mice (missing value inputation)
+
+
+
+## 4: Exploring / Visualizing our data
+
+Objective:
+
+* Find patterns in your data through visualizations and charts
+* Extract features by using statistics to identify and test significant variables
+
+Skills Required:
+* Descriptive & Inferential statistics
+* Data Visualization
+
+
+
+## 5: Modeling our data
+
+Objective:
+
+* In-depth Analytics: create predictive models/algorithms
+* Select appropriate model setups and choose model classes
+* Evaluate and refine the model
+
+Skills Required:
+
+* Machine Learning: Supervised/Unsupervised algorithms
+* Linear algebra & Multivariate Calculus
+* Evaluation methods
+
+
+
+
+## 6: Communicate results
+
+Objective:
+
+* Identify business insights: return back to business problem
+* Visualize your findings accordingly: keep it simple and priority driven
+* Tell a clear and actionable story: effectively communicate to non-technical audience
+
+Skills Required:
+
+* Business Domain Knowledge
+* Data Visualization Tools: 
+     * Tablaeu, MS PowerBI (AAU license), Google's Datastudio (free)
+     
+
+
+
+# Summary
+
+## What we learned today
+
+* Make sure you have a good data foundation
+* Make sure your pipeline is solid end to end
+* Start with a reasonable objective
+* Understand your data intuitively
+* Make sure that your pipeline stays solid
+
