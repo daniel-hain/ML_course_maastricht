@@ -1,4 +1,4 @@
-# Introduction to Machine Learning for Policy Analysis (Maastricht 2020)
+# Introduction to Machine Learning for Policy Analysis (Maastricht 2021)
 
 Dear Students, welcome to the course repository, where you will find all informations supplementing this terms machine learning course.
 
