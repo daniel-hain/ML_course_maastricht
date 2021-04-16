@@ -35,8 +35,7 @@ In this part you will be introduced to the fundamentals of analysing textual dat
   [ ::> Video 1: Introduction to text analysis in R <:: ](https://www.loom.com/share/5648ecba2c26429aaebcda7ba8ffb83a?from_recorder=1) 
   [ ::> Html <::](https://daniel-hain.github.io/ML_course_maastricht/notebooks/NLP_intro_R.nb.html) 
 * A: Working with long text and extracting text elements Vin R 
- [ ::> Video 1: Preprocessing & Sentiments <:: ](https://www.loom.com/share/693668d74ce74697870fd97a8256d682?from_recorder=1)
- [ ::> Video 2: Entity extraction <:: ](https://www.loom.com/share/647407c8959a4702b14c7db8dcf055f0?from_recorder=1) 
+ [ ::> Video 1: Comming soon <:: ]()
  [ ::> Html <::](https://daniel-hain.github.io/ML_course_maastricht/notebooks/NLP_long_text_R.nb.html) 
 * A: Text Vectorization and Topic Modelling in R 
  [ ::> Video 1 <:: ](https://www.loom.com/share/e9e054a738f3472983c905b1b739b9c3) 
