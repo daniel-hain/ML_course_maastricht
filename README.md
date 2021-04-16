@@ -30,7 +30,7 @@ Legend:
   [ ::> Html <::](https://sds-aau.github.io/SDS-master/M2/notebooks/NLP_intro_R.nb.html) 
 * A: Working with long text and extracting text elements Vin R 
  [ ::> Video 1: Preprocessing & Sentiments <:: ](https://www.loom.com/share/693668d74ce74697870fd97a8256d682?from_recorder=1)
- [ ::> Video 2: Entity extraction](https://www.loom.com/share/647407c8959a4702b14c7db8dcf055f0?from_recorder=1) 
+ [ ::> Video 2: Entity extraction <:: ](https://www.loom.com/share/647407c8959a4702b14c7db8dcf055f0?from_recorder=1) 
  [ ::> Html <::](https://sds-aau.github.io/SDS-master/M2/notebooks/NLP_long_text_R.nb.html) 
 * A: Text Vectorization and Topic Modelling in R 
  [ ::> Video 1 <:: ](https://www.loom.com/share/e9e054a738f3472983c905b1b739b9c3) 
