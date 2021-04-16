@@ -1,0 +1,277 @@
+---
+title: 'Introduction to Natural-language-Processing (R)'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_notebook:
+    code_folding: show
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+### Generic preamble
+rm(list=ls())
+Sys.setenv(LANG = "en") # For english language
+options(scipen = 5) # To deactivate annoying scientific number notation
+
+### Knitr options
+library(knitr) # For display of the markdown
+knitr::opts_chunk$set(warning=FALSE,
+                     message=FALSE,
+                     comment=FALSE, 
+                     fig.align="center"
+                     )
+```
+
+```{r}
+### Load standardpackages
+library(tidyverse) # Collection of all the good stuff like dplyr, ggplot2 ect.
+library(magrittr) # For extra-piping operators (eg. %<>%)
+```
+
+### This session
+
+In this applied session, you will:
+
+1. Refresh basic string manipulation skills
+2. Learn how to tokenize texts and analyze these tokens
+3. Apply these skills on twitter data
+
+
+# Refresher: Basics of String Manupilation
+
+We start by taking a piece of text and turning it into something that carries the meaning of the initial text but is less noisy and thus perhaps easier to "understand" by a computer.
+
+```{r}
+text <- "The Eton-educated, non-binary British Iraqi had always struggled with their identity, until they discovered drag. Yet the 29 year old says the performances come at a high price"
+```
+
+```{r}
+# Transforming to lower case
+text %>% str_to_lower()
+```
+
+```{r}
+# Split by '.' (=sentence)
+text %>% str_split('\\.')
+```
+
+```{r}
+text %>% str_replace_all('o', 'O')
+```
+
+```{r}
+# Split by ' ' (=word)
+text %>% str_remove_all('[[:punct:]]') %>% str_split(' ') %>% unlist()
+```
+
+```{r}
+text %>% str_to_lower() %>% str_remove_all('[[:punct:]]') %>% str_split(' ') 
+```
+
+# The R NLP ecosystem 
+
+* Most language analysis approaches are based on the analysis of texts word-by-word. 
+* Here, their order might matter (word sequence models) or not (bag-of-words models), but the smallest unit of analysis is usually the word. 
+* This is usually done in context of the document the word appeared in. Therefore, on first glance three types datastructures make sense:
+
+1. **Tidy:**  Approach, where data is served in a 2-column document-word format (e.g., `tidytext`)
+2. **Token lists:** Creation of special objects, saved as document-token lists or corpus (e.g., `tm`, `quanteda`)
+3. **Matrix:** Long approach, where data is served as document-term matrix, term-frequency matrix, etc.
+
+* Different forms of analysis (and the packages used therefore) favor different structures, so we need to be fluent in transfering original raw-text in * These formats, as well as switching between them. (for more infos, check [here](https://www.tidytextmining.com/dtm.html)).
+
+![](https://sds-aau.github.io/SDS-master/00_media/nlp_tidyworkflow.png)
+
+## Tidy Text Formats
+
+* While there exist other ecosystems to do txt analysis (e.g., `tm`, `quanteda`), I will here almost exclusively use `tidytext`, which is very simple yet powerful, very well documented, and works very neathly with `tidymodels` and the rest of the `tidyverse` ecosystem.
+
+
+```{r}
+library(tidytext)
+```
+
+* While we will for later applications we will use different formats, we here will limit ourselves to word token, which can do most of the simple jobs.
+* Here, we apply tidy principles to text, make word-token per document our unit of analysis.
+* Therefore, every row repreesents a word per document.
+This sounds like a lot of redundancy, but makes it very easy to work with compared to more complez matrix and list formats. Here, we can do our usual sumarries and visualizations pretty much out-of-the-box.
+
+```{r}
+# Tidytext wants a tibble as point of departure
+text_tbl <- tibble(id = 1, text = text)
+```
+
+```{r}
+# We now unnest the tokens. Notice it is by default deleting all punctuation and transforming the text to lower chars.
+text_tidy <- text_tbl %>% unnest_tokens(word, text, token = 'words')
+```
+
+* Overall, in NLP we are trying to represent meaning structure. 
+* That means that we want to focus on the most important and "meaning-bearing elements" in text, while reducing noise. 
+* Words such as "and", "have", "the" may have central syntactic functions but are not particularly important from a semantic perspective.
+
+```{r}
+# Tidytext comes with a stopword lexicon
+stop_words
+```
+
+```{r}
+text_tidy %<>%
+  anti_join(stop_words, by = 'word')
+```
+
+```{r}
+text_tidy
+```
+
+
+```{r}
+# We now unnest the tokens. Notice it is by default deleting all punctuation and transforming the text to lower chars.
+sentences_tidy <- text_tbl %>% unnest_tokens(word, text, token = 'sentences')
+```
+
+```{r}
+sentences_tidy
+```
+
+## Your turn!
+
+![](https://media.giphy.com/media/9rwFfmB2qJ0mEsmkfj/giphy.gif)
+
+Take the following text and transform it into a list of lists with with each element being a tokenized sentence. Remove stopwords, lower all tokens and keep only (1) alpha-numeric word tokens, (2) charactewr tokens.
+
+`I’ve been called many things in my life, but never an optimist. That was fine by me. I believed pessimists lived in a constant state of pleasant surprise: if you always expected the worst, things generally turned out better than you imagined. The only real problem with pessimism, I figured, was that too much of it could accidentally turn you into an optimist.`
+
+source: https://www.theguardian.com/global/2019/nov/21/glass-half-full-how-i-learned-to-be-an-optimist-in-a-week
+
+# Trump Tweets Processing many short texts and simple stats
+
+An introduction to NLP would not be the same without Donald's tweets. Let's use these tweets for some more basic NLP and let's try to gather some insights...maybe
+
+![donald_tweets](https://i.cdn.cnn.com/cnn/interactive/2017/politics/trump-tweets/media/trump-tweets-hdr-02.jpg)
+
+Let's try to use some very simple statistics on twitter data, thanks to [Trump Twitter Archive](http://www.trumptwitterarchive.com)
+
+**Note:** We here already use precompiled data. However, you could use the [`rtweet`](https://github.com/ropensci/rtweet) package and instead work with own data on tweets of interest.
+
+```{r}
+# we will load some json files
+library(jsonlite)
+library(tidyjson)
+```
+
+
+```{r}
+# download and open some Trump tweets from trump_tweet_data_archive
+tmp <- tempfile()
+download.file("https://github.com/bpb27/trump_tweet_data_archive/raw/master/condensed_2018.json.zip", tmp)
+trump_tweets <- stream_in(unz(tmp, "condensed_2018.json"))
+```
+
+```{r}
+trump_tweets %>% glimpse()
+```
+
+```{r}
+library(lubridate) # For workin with times
+trump_tweets %<>%
+  mutate(created_at = paste(substr(created_at,27,30),
+                      substr(created_at,5,7),
+                      substr(created_at,9,10),
+                      substr(created_at,12,20)) %>% 
+           as_datetime())
+```
+
+Notye: We will not use the times of tweet for now, but feel free to discover, and maybe reconstruct something inspired by [THIS AMAZING PAPER!!!](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7518119/)
+
+
+```{r}
+# Lets filter out retweets
+trump_tweets %<>%
+  filter(is_retweet == FALSE)
+```
+
+
+```{r}
+# LEts tokenize. Notice that there are special tokens for tweets which keep usefull special characters
+trump_token <-trump_tweets %>%
+  select(id_str, text) %>%
+  unnest_tokens(word, text, token = "tweets")
+```
+
+```{r}
+trump_token %<>%
+  anti_join(stop_words, by = 'word')
+```
+
+
+```{r}
+trump_token %>% count(word, sort = TRUE) %>% head(100)
+```
+
+Lets see who trump mentions
+
+```{r}
+trump_token %>%
+  filter(word %>% str_detect('@')) %>%
+  count(word, sort = TRUE)
+```
+
+## Your turn
+
+![alt text](https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif)
+
+The link below holds a datasewt with ~10k #OKBoomer tweets from the days 10-21 Nov 2019.
+
+https://github.com/SDS-AAU/SDS-master/raw/master/M2/data/tweets_boomer.zip
+
+What to do: 
+* Use elements from the above code to make a list of the most common hashtags (you have to get the hashtags from the text, not using the column containing them already)
+* Also try to have a look at hashtags over time: Take out the 10 most common hashtags - excluding #OKBoomer - and plot their occurrence over the days in the data
+
+Plan of attack:
+
+*   Convert the timestamp into a datetime
+*   Calculate the occurence of the specific hashtags (itentified by a trailing `#`) in the chosen timespan (here: Days)
+*   Plot (days on x, n on y)
+
+Go!
+
+# Endnotes
+
+### Main reference
+
+* R for Data Science (Grolemund & Wickham)
+   * [Chapter 14](https://r4ds.had.co.nz/strings.html): To refresh simple string manipulations
+* Julia Silge and David Robinson (2020). Text Mining with R: A Tidy Approach, O’Reilly. Online available [here](https://www.tidytextmining.com/)
+   * [Chapter 1](https://www.tidytextmining.com/tidytext.html): Introduction to the tidy text format
+
+### Packages & Ecosystem
+
+* [`tidytext`](https://github.com/juliasilge/tidytext)
+
+further: 
+* [`rtweet`](https://github.com/ropensci/rtweet): R interface to the twitter API.
+
+### Suggestions for further study
+
+* DataCamp (!Most courses have somewhat outdated ecosystems)
+   * [Introduction to Text Analysis in R](https://learn.datacamp.com/courses/introduction-to-text-analysis-in-r): The basics of text analysis in R      
+   * [Introduction to Natural Language Processing in R](https://learn.datacamp.com/courses/introduction-to-natural-language-processing-in-r): Some refresher plus more advanced applications in the end.         
+  
+### Session Info
+
+```{r}
+sessionInfo()
+```
+
+
+
+
+

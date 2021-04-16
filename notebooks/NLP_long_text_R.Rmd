@@ -1,0 +1,520 @@
+---
+title: 'Natural-language-Processing (R)'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_notebook:
+    code_folding: show
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+### Generic preamble
+rm(list=ls())
+Sys.setenv(LANG = "en") # For english language
+options(scipen = 5) # To deactivate annoying scientific number notation
+
+### Knitr options
+library(knitr) # For display of the markdown
+knitr::opts_chunk$set(warning=FALSE,
+                     message=FALSE,
+                     comment=FALSE, 
+                     fig.align="center"
+                     )
+```
+
+```{r}
+### Load standardpackages
+library(tidyverse) # Collection of all the good stuff like dplyr, ggplot2 ect.
+library(magrittr) # For extra-piping operators (eg. %<>%)
+```
+
+### This session
+
+* Now, that we have some experience with short texts, let's try out to work with longer texts. 
+* We will be analysing  a whole (very long) book. 
+* We will continue using more of the `tidytext` functionality.
+* However, we will also introduce `Spacy`, a high-level DeepLearning based NLP library that will help us to do complex stuff with not too much code 
+
+# Exploring 'Crime and Punishment'
+
+Let's raise the bar with some **Fyodor Dostoevsky**
+
+![](https://i.pinimg.com/564x/bc/eb/9c/bceb9cef99abbed52b940767c9530bbc.jpg)
+
+```{r}
+library(tidytext)
+```
+
+## Download Data
+
+```{r}
+# We first need to get the book text. It can be conveniently retrieved via the gutenbergr library, linking r to the Gutenberg project
+library(gutenbergr)
+```
+
+```{r}
+# check the id of crime and punishment
+gutenberg_metadata %>%
+  filter(title == "Crime and Punishment")
+```
+
+```{r}
+text_raw <- gutenberg_download(2554)
+```
+
+```{r}
+text_raw %>% glimpse()
+```
+
+```{r}
+# LEts take a look
+text_raw %>% head(200)
+```
+
+## Preprocessing
+
+* We see the data is read in by line rather than one cell per book/chapter, or paragraph.
+* We also see all original line breaks are contained, including empty lines
+* The real book starts at line 102
+* The parts and chapters are assigned, info we can probably use.
+* to create IDs for the text chunks, we could use the linenumber
+* Then we could already get rid of empty and chapter lines
+
+```{r}
+text <- text_raw %>%
+  select(-gutenberg_id) %>%
+  slice(-c(1:102)) %>%
+  mutate(line_num = row_number(),# create new variable line_num
+         part = cumsum(str_detect(text, regex("^PART [\\divxlc]",
+                                                  ignore_case = TRUE)))) %>% # create variable part: Crime and Punishment has 7 parts %>%
+         group_by(part) %>%
+         mutate(chapter = cumsum(str_detect(text, regex("^CHAPTER [\\divxlc]",
+                                                          ignore_case = TRUE)))) %>% # create new variable number of Chapter per part %>%
+         ungroup() %>%
+  filter(text != "" & !str_detect(text, regex("^[PART|CHAPTER]"))) %>%
+  mutate(index = 1:n()) %>%
+  relocate(index, line_num, part, chapter, text)
+  
+```
+
+```{r}
+text %>% glimpse()
+```
+
+Cool!
+
+```{r}
+text_tidy <- text %>% unnest_tokens(word, text, token = 'words') %>%
+  anti_join(stop_words, by = 'word')
+```
+
+```{r}
+text_tidy %>% head(10)
+```
+
+## Stemming
+
+* We will not use it here a lot, but consider stemming as a possible pre-processing option.
+* Here, words will be reduced to their common word-stem, eg. words like "analysis", "analyze", "analyzing" etc. will all be reduced to "analyz"
+* This sometimes makes it easier to work with word token, however, also is sometimes to aggresive and reduces interpretability.
+
+```{r}
+library(SnowballC) # Includes stemming algos
+```
+
+
+```{r}
+text_tidy %>%
+  mutate(stem = wordStem(word)) %>%
+  head(10)
+```
+
+```{r}
+text_tidy %>%
+  mutate(stem = wordStem(word)) %>%
+  count(stem, sort = TRUE) %>%
+  head(50)
+```
+
+# First exploration
+
+## Topwords
+
+```{r}
+# top 10 words used in Crime and Punishment
+text_tidy %>%
+  count(word, sort = TRUE) %>%
+  slice(1:10) %>%
+  ggplot(aes(x = fct_reorder(word, n), y = n, fill = word)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(title = "Crime and Punishment: Top 10 words used", x = NULL) 
+```
+
+* Unsurprisingly, the word used more often corresponds to the name of the main character, Raskolnikov. 
+* We can also use a word cloud:
+
+```{r}
+# People love wordclouds
+library(wordcloud)
+
+text_tidy %>%
+  count(word) %>%
+  with(wordcloud(word, n, 
+                 max.words = 50, 
+                 color = "blue"))
+```
+
+## Sentiment Analysis
+
+* While interesting, word frequency does not tell us much about the emotions/states of mind present in the novel. 
+* For this reason, we will go ahead with a sentiment analysis of “Crime and Punishment”
+
+* While sounding very comlpex, sentiment analysis is usually done in a rather simple way.
+* There are already predefined sentiment lexica around, linking words ith certain sentiments
+* So we do have to only join our word-token with the corresponding sentiments
+* The most popular dictionaries available are
+   1. "bing": classifies words binary into positive and negative sentiment
+   2. “nrc”  has the following emotion categories: positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust; and
+   3. “afinn” corresponds to a sentiment score from -5 (very negative) to 5 (very positive). 
+
+
+```{r}
+# You might need to first install the 'textdata' package for some of the lexica
+get_sentiments("bing") %>% 
+  head(20)
+```
+
+Lets calculate them all
+
+```{r}
+sentiment_bing <- text_tidy %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(chapter, index = index %/% 100, sentiment) %>% # index of 100 lines of text
+  mutate(lexicon = 'Bing')
+  
+sentiment_nrc <- text_tidy %>%  
+  inner_join(get_sentiments("nrc")) %>%
+  count(chapter, index = index %/% 100, sentiment) %>% # index of 100 lines of text
+  mutate(lexicon = 'NRC')
+
+sentiment_afinn <- text_tidy %>%  
+  select(-line_num, -part) %>%
+  inner_join(get_sentiments("afinn")) %>%
+  group_by(index = index %/% 100)  %>% # index of 100 lines of text
+  summarise(sentiment = sum(value, na.rm = TRUE)) %>%
+  mutate(lexicon = 'AFINN')
+```
+
+
+```{r}
+# Lets join them all together for plotting
+sentiment_all <- sentiment_afinn %>%
+  bind_rows(sentiment_bing %>%
+              pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>% 
+              mutate(sentiment = positive - negative) %>%
+              select(index, sentiment, lexicon) ) %>%
+    bind_rows(sentiment_nrc %>%
+              pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>% 
+              mutate(sentiment = positive - negative) %>%
+              select(index, sentiment, lexicon) ) 
+```
+
+```{r, fig.height=5, fig.width=15}
+# crime and punishment - 
+sentiment_all %>%
+  ggplot(aes(x = index, y = sentiment, fill = lexicon)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ lexicon) + 
+  labs(title = "Sentiment Analysis: “Crime and Punishment",
+       subtitle = 'Using the Bing, NRC, AFINN lexicon') 
+```
+
+* Since NRS also provides us with options to dive deeper into specific, rather than only positive and negative sentiments.
+
+```{r}
+text_tidy %>%
+  inner_join(get_sentiments("nrc")) %>%
+  count(word, sentiment, sort = TRUE) %>% 
+  filter(sentiment %in% c("joy", "sadness")) %>%
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>%
+  as.data.frame() %>% 
+  remove_rownames() %>% 
+  column_to_rownames("word") %>% 
+  comparison.cloud(colors = c("darkgreen", "grey75"), 
+                   max.words = 100,
+                   title.size = 1.5)
+```
+
+```{r, fig.height=5, fig.width=15}
+# crime and punishment - 
+sentiment_nrc %>%
+  ggplot(aes(x = index, y = sentiment, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ chapter) + 
+  labs(title = "Sentiment Analysis: “Crime and Punishment",
+       subtitle = 'By chapter: Using NRC lexicon') 
+```
+
+
+### Word network
+
+* So far we’ve considered words as individual units, and considered their relationships to sentiments or to documents. 
+* However, many interesting text analyses are based on the relationships between words, whether examining which words tend to follow others immediately, or that tend to co-occur within the same documents.
+* Obviously, we no have to sprinkle in some networks here
+* The easiest way would bee to look t words that frequently occur together.
+* We could do that in a more complicated way, but since we already have the line-nubmer, why not start with creating edges between words in the same line?
+* `tidytext` had an amazing function `pairwise_count` for that. However, since it is of more general use,  the developers outsourced it into the not-text-specific `widyr` package, which they also maintain.
+
+```{r}
+library(widyr)
+el_words <- text_tidy %>%
+  pairwise_count(word, index, sort = TRUE) %>%
+  rename(from = item1, to = item2, weight = n)
+```
+
+```{r}
+el_words %>% head()
+```
+
+```{r}
+library(tidygraph)
+library(ggraph)
+```
+
+```{r}
+g <- el_words %>%
+  filter(weight >= 9) %>%
+  as_tbl_graph(directed = FALSE) %>%
+  igraph::simplify() %>% as_tbl_graph() 
+```
+
+
+```{r, fig.width=10, fig.height=10}
+set.seed(1337)
+g %N>%
+#  filter(centrality_degree(weight = weight) > 100) %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(width = weight, edge_alpha = weight)) +
+  geom_node_point(aes(size = centrality_degree(weight = weight)), color = "plum4") +
+  geom_node_text(aes(label = name,), repel = TRUE) +
+  theme_graph() +
+  theme(legend.position = 'none') +
+  labs(title = 'Co-Word Network Crime and Punishment')
+```
+
+## Bigrams and n-grams
+
+* Often, a meaning is not only unfolded by a single word, but a combination of words, such as in eg. "Machine Learning", "Entity Recognition" etc.
+* Likewise, we have been using the `unnest_tokens` function to tokenize by word, or sometimes by sentence, which is useful for the kinds of sentiment and frequency analyses we’ve been doing so far. 
+* But we can also use the function to tokenize into consecutive sequences of words, called n-grams. 
+* To do so, we just have to supply the `token = 'ngrams'` argument, and specify how many subsequent words we want to consider.
+
+```{r}
+text_tidy_ngrams <- text %>% 
+  unnest_tokens(bigram, text, token = 'ngrams', n = 2) %>%
+  na.omit()
+```
+
+```{r}
+text_tidy_ngrams %>% head()
+```
+
+```{r}
+text_tidy_ngrams %>% 
+  count(bigram, sort = TRUE) %>%
+  head(100)
+``` 
+
+* We now also can get rid of stopwords like before
+* However, there we first have to seperate the bigrams again, then get rid of stopwords, and then we can unite them again.
+
+```{r}
+# Seperate them
+text_tidy_ngrams %<>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+```
+
+```{r}
+text_tidy_ngrams %>% head()
+```
+
+```{r}
+# Get rid of stopwords
+text_tidy_ngrams %<>%
+  anti_join(stop_words, by = c('word1' = 'word')) %>%
+  anti_join(stop_words, by = c('word2' = 'word')) 
+```
+
+```{r}
+# And unite again
+text_tidy_ngrams %<>%
+  unite(bigram, word1, word2, sep = " ")
+```
+
+```{r}
+# And finally count
+text_tidy_ngrams %<>%
+  count(index, bigram)
+```
+
+```{r}
+text_tidy_ngrams %>%
+  count(bigram, wt = n, sort = TRUE) %>%
+  head(50)
+```
+
+* These bigrams could now be analyzed on their own, or used as token for all the stuff we can do, for instance topic modelling, ML, etc....
+
+Just for fun, a little gender analysis now...
+
+```{r}
+# Define our pronouns
+pronouns <- c("he", "she")
+```
+
+```{r}
+# Get our bigram where first word is a pronoun
+gender_bigrams <-  text %>% 
+  unnest_tokens(bigram, text, token = 'ngrams', n = 2) %>%
+  na.omit() %>%
+  count(bigram) %>%
+  separate(bigram, c("word1", "word2"), sep = " ") %>%
+  filter(word1 %in% pronouns) %>%
+  count(word1, word2, wt = n, sort = TRUE) 
+```
+
+## Named Entity Recognition (introducing spacy)
+
+* In this part of the tutorial, I will introduce Spacy, a high-level DeepLearning based NLP library that will help us to do complex stuff with not too much code and without having do go deep into "old-school-NLP"
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/SpaCy_logo.svg/1200px-SpaCy_logo.svg.png) {width=600}
+
+
+* Here a nice [cheat-sheet](https://www.datacamp.com/community/blog/spacy-cheatsheet)
+* Spacy is today one of the leading solutions for NLP in industry which goes as far as them hosting a [whole conference](https://www.youtube.com/watch?v=hNPwRPg9BrQ&list=PLBmcuObd5An4UC6jvK_-eSl6jCvP1gwXc) with the leading NLP experts worldwide in Berlin last summer
+* It is implemented as a Python package, but accessible via the `spacyr` wrapper.
+* Most documentation will be found for python, but almost all functions afe available in the r version in the same way.
+
+```{r}
+library(spacyr)
+# spacy_install() # creates a new conda environment called spacy_condaenv, as long as some version of conda is installed 
+```
+
+```{r}
+spacy_initialize(model = "en_core_web_sm")
+```
+
+```{r}
+text_example <- c(d1 = "spaCy is great at fast natural language processing. Everybody loves it! 
+                  In Denmark and elsewhere.",
+                  d2 = "We can also use it in R via the great spacyR wrapper. Daniel Michels does that sometimes")
+```
+
+```{r}
+# process documents and obtain a data.table
+text_parsed <- spacy_parse(text_example)
+```
+
+```{r}
+text_parsed
+```
+
+* Dependency parsing: Detailed parsing of syntactic dependencies is possible with the dependency = TRUE option:
+
+```{r}
+text_example %>% spacy_parse(dependency = TRUE, lemma = FALSE, pos = FALSE)
+```
+
+```{r}
+text_chapter <- text %>%
+  group_by(chapter) %>%
+  summarise(text = paste(text, collapse = ' ')) %>%
+  pivot_wider(names_from = chapter, values_from = text)
+```
+
+```{r}
+text_entities <-text_chapter %>% as.character() %>% spacy_parse(entity = TRUE)
+```
+
+```{r}
+text_entities %>% head(1000)
+```
+Cool or cool?
+
+We can now again create a network, right? this time really a character network!
+
+```{r}
+el_persons <- text_entities %>% 
+  entity_consolidate() %>%
+  filter(entity_type %>% str_detect('PERSON')) %>%
+  unite(chap_sent_id, doc_id, sentence_id, sep = '_') %>%
+  pairwise_count(token, chap_sent_id, sort = TRUE) %>%
+  rename(from = item1, to = item2, weight = n)
+```
+
+```{r}
+el_persons %>% head(50)
+```
+
+```{r}
+g <- el_persons %>%
+  as_tbl_graph(directed = FALSE) %>%
+  igraph::simplify() %>% as_tbl_graph() 
+```
+
+
+```{r, fig.width=10, fig.height=10}
+set.seed(1337)
+g %N>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(width = weight, edge_alpha = weight)) +
+  geom_node_point(aes(size = centrality_degree(weight = weight)), color = "plum4") +
+  geom_node_text(aes(label = name,), repel = TRUE) +
+  theme_graph() +
+  theme(legend.position = 'none') +
+  labs(title = 'Character Network Crime and Punishment')
+```
+
+# Endnotes
+
+### Main reference
+
+
+* Julia Silge and David Robinson (2020). Text Mining with R: A Tidy Approach, O’Reilly. Online available [here](https://www.tidytextmining.com/)
+   * [Chapter 2](https://www.tidytextmining.com/sentiment.html): Introduction to sentiment analysis
+* Emil Hvidfeldt and Julia Silge (2020). Supervised Machine Learning for Text Analysis in R, online available [here](https://smltar.com/)
+   * [Chapter 4](https://smltar.com/stemming.html): Stemming
+
+
+### Packages & Ecosystem
+
+* [`tidytext`](https://github.com/juliasilge/tidytext)
+
+further: 
+* [`spacyr`](https://github.com/quanteda/spacyr): R wrapper for spaCy. Also check [this tutorial](https://cran.r-project.org/web/packages/spacyr/vignettes/using_spacyr.html)
+
+### Suggestions for further study
+
+DataCamp (!Most courses have somewhat outdated ecosystems)
+
+* [Introduction to Natural Language Processing in R](https://learn.datacamp.com/courses/introduction-to-natural-language-processing-in-r): Some refresher plus more advanced applications in the end. 
+
+ 
+ 
+### Session Info
+
+```{r}
+sessionInfo()
+```
+
+
+
+
+
