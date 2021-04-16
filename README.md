@@ -1,16 +1,18 @@
 # Introduction to Machine Learning for Policy Analysis (Maastricht 2021)
 
-Dear Students, welcome to the course repository, where you will find all informations supplementing this term's machine learning for policy analysis course. Here you will find the lectures on the two topics introduced (Supervised Machine LEarning & Natural Language Processing) in video format plus facilitating rmarkdown notebooks.
+Dear Students, welcome to the course repository, where you will find all informations supplementing this term's machine learning for policy analysis course. Here you will find the lectures on the two topics introduced (Supervised Machine Learning & Natural Language Processing) in video format plus facilitating rmarkdown notebooks.
+
+To get the most out of this lectures, I expect you to have R & R-Studio installed and updated on your local machine, and to be generally used to do data analytics in R using the ´tidyverse´ ecosystem. If that is not the case, you might want to take a look at the adittional resoures such as ´My R Brush-up course (Bonus)´ below, where I recap the fundamentals of working with data in R.
 
 
+
+# Lectures
 
 Legend:
 
 * T: Theory lecture, explaining concepts without using to much code
 * A: Applications and demonstrations of concepts and techniques, mostly code-based
 * E: Execises for you to try your skills
-
-# Lectures
 
 ## Introduction to Supervised Machine Learning (S-ML) in R
 
