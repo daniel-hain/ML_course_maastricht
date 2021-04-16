@@ -45,6 +45,8 @@ In this part you will be introduced to the fundamentals of analysing textual dat
 
 # Further Resources
 
+Find below a list of sfurther resources (including own material), either to brush-up basic R knowledge, supplement what you learn here, or dive deeper into related or advanced topics.
+
 ## Data Science in R in general
 
 * Wickham, H., & Grolemund, G. (2016). R for data science: import, tidy, transform, visualize, and model data. O'Reilly Media, Inc. [Online available here](https://r4ds.had.co.nz/)
