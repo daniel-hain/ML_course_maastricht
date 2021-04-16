@@ -58,12 +58,13 @@ Find below a list of sfurther resources (including own material), either to brus
 ## Supervised Machine Learning
 
 * [Hain, D., & Jurowetzki, R. (2020). Introduction to Rare-Event Predictive Modeling for Inferential Statisticians--A Hands-On Application in the Prediction of Breakthrough Patents. arXiv preprint arXiv:2003.13441.](https://arxiv.org/abs/2003.13441): Some of our introductory papers. An a bit more elaborate version of what we did so far on a more exciting dataset.
-* [Kuhn, M., Silge, J. (2020). Tidy Modeling with R](https://www.tmwr.org/)
-* [Kuhn & Johnson (2019), Feature Engineering and Selection: A Practical Approach for Predictive Models, Taylor & Francis.](https://bookdown.org/max/FES/): Less code but much deep insights in modern ML details, by Thomas Kuhn, the maker of much of `tidymodels` and `caret`
+* [Kuhn, M., Silge, J. (2020). Tidy Modeling with R](https://www.tmwr.org/): GReat introduction to `tidymodels` by the makers.
+* [Kuhn, M.  & Johnson (2019), Feature Engineering and Selection: A Practical Approach for Predictive Models, Taylor & Francis.](https://bookdown.org/max/FES/): Less code but much deep insights in modern ML details, by Thomas Kuhn, the maker of much of `tidymodels` and `caret`
 * [Silge, Julia (2020). Supervised Machine Learning Case Studies in R. Online course](https://supervised-ml-course.netlify.app/): Great interactive course Julia took out of DataCamp to offer it for free instead. Fully updated to the tidymodels workflow. YOU ALL SHOULD DO IT!
 
 ## Natural Language Processing
 
+* [Hain, Daniel, et al. "Text-based Technological Signatures and Similarities: How to create them and what to do with them." arXiv preprint arXiv:2003.12303 (2020)](https://arxiv.org/pdf/2003.12303.pdf): Own paper, where we introduce to text embeddings and use it to map technology based on patent data.
 * [Julia Silge and David Robinson (2020). Text Mining with R: A Tidy Approach, O’Reilly.](https://www.tidytextmining.com/): Great introduction to the `tidytext` ecosystem and NLP in R by the package makers.
 * [Emil Hvidfeldt and Julia Silge (2020). Supervised Machine Learning for Text Analysis in R](https://smltar.com/): More advanced introduction to SML based on textual data.
 
