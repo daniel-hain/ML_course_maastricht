@@ -14,7 +14,7 @@ Legend:
 
 ## Introduction to Supervised Machine Learning (S-ML) in R
 
-This part will introduce you to the fundamentals of supervised machine learning (SML, aka. predictive modelling), and illustrate practical applications theeof in R.
+This part will introduce you to the fundamentals of supervised machine learning (SML, aka. predictive modelling), and illustrate practical applications theeof in R. 
 
 * T: Introduction to supervised ML 
  [ ::> Video 1: Introduction & Statistics Refresher <:: ](https://www.loom.com/share/1092fff1eb8843a0b084618a8118c3db) 
@@ -47,27 +47,32 @@ In this part you will be introduced to the fundamentals of analysing textual dat
 
 Find below a list of sfurther resources (including own material), either to brush-up basic R knowledge, supplement what you learn here, or dive deeper into related or advanced topics.
 
+## Interesting papers 
+
 ## Data Science in R in general
 
-* Wickham, H., & Grolemund, G. (2016). R for data science: import, tidy, transform, visualize, and model data. O'Reilly Media, Inc. [Online available here](https://r4ds.had.co.nz/)
-* Baumer, B., Kaplan, D. & Horton, N. (2020) Modern Data Science with R (2nd Ed.). CRC Press [Online available here](https://beanumber.github.io/mdsr2e/)
+* [Wickham, H., & Grolemund, G. (2016). R for data science: import, tidy, transform, visualize, and model data. O'Reilly Media, Inc.](https://r4ds.had.co.nz/): The bible of modern data science in R. USe this to get started.
+* [Baumer, B., Kaplan, D. & Horton, N. (2020) Modern Data Science with R (2nd Ed.). CRC Press ](https://beanumber.github.io/mdsr2e/): Also nice supplementart book, also touching upon topics such as simulation and network analysis.
+* [Ismay & Kim (2020), Statistical Inference via Data Science: A ModernDive into R and the Tidyverse, CRC Press.](https://moderndive.com/): For those who want to first update their knowledge in basic and inferential statistics in a modern R setup.
 
 ## Supervised Machine Learning
 
-* Kuhn, M., Silge, J. (2020) Tidy Modeling with R [Online available here](https://www.tmwr.org/)
-* [Supervised Machine Learning Case Studies in R (Julia Sigle)](https://supervised-ml-course.netlify.app/)
-* [Feature Engineering and Selection: A Practical Approach for Predictive Models (Max Kuhn)](https://bookdown.org/max/FES/)
+* [Hain, D., & Jurowetzki, R. (2020). Introduction to Rare-Event Predictive Modeling for Inferential Statisticians--A Hands-On Application in the Prediction of Breakthrough Patents. arXiv preprint arXiv:2003.13441.](https://arxiv.org/abs/2003.13441): Some of our introductory papers. An a bit more elaborate version of what we did so far on a more exciting dataset.
+* [Kuhn, M., Silge, J. (2020). Tidy Modeling with R](https://www.tmwr.org/)
+* [Kuhn & Johnson (2019), Feature Engineering and Selection: A Practical Approach for Predictive Models, Taylor & Francis.](https://bookdown.org/max/FES/): Less code but much deep insights in modern ML details, by Thomas Kuhn, the maker of much of `tidymodels` and `caret`
+* [Silge, Julia (2020). Supervised Machine Learning Case Studies in R. Online course](https://supervised-ml-course.netlify.app/): Great interactive course Julia took out of DataCamp to offer it for free instead. Fully updated to the tidymodels workflow. YOU ALL SHOULD DO IT!
 
 ## Natural Language Processing
 
 
 ## Further topics of (potential) interest
 
+* [Efficient R Programming](https://csgillespie.github.io/efficientR/)
 * [Fundamentals of Data Visualization (O'Reily)](https://serialmentor.com/dataviz/)
 * [Data Visualization (R): A practical introduction](https://socviz.co/index.html)
 * [Exploring Enterprise Databases with R](https://smithjd.github.io/sql-pet/)
 * [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
-* [Efficient R Programming](https://csgillespie.github.io/efficientR/)
+
 
 ## My R Brush-up course (Bonus)
 
