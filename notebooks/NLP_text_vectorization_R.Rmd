@@ -459,13 +459,10 @@ lda_gamma %>%
   left_join(text %>% select(id, projectacronym) %>% mutate(id = id %>% as.character()), by = c('document' = 'id'))
 ```
 
-
-
 * Note that an LDA can also be performed via a recipe:
 
 ```{r}
 recipe_lda <- recipe_base %>% # tokenize
-  step_untokenize(text) %>% # Is a bit silly, needs the full text vectors instead of tokens....
   step_lda(text, num_topics = 6) %>% # LDA
   prep() 
 ```
@@ -519,9 +516,9 @@ json_lda %>% serVis() # For direct output
 ```
 
 
-<iframe width="1200" height="1500" src="https://sds-aau.github.io/SDS-master/M2/notebooks/LDAviz/index.html" frameborder="0"></iframe> 
+<iframe width="1200" height="1500" src="https://daniel-hain.github.io/ML_course_maastricht/notebooks/LDAviz/index.html" frameborder="0"></iframe> 
 
-Didnt really figure out how to embedd the resulting plot, but the outcome can be seen [here](https://sds-aau.github.io/SDS-master/M2/notebooks/LDAviz/index.html)
+Didnt really figure out how to embedd the resulting plot, but the outcome can be seen [here](https://daniel-hain.github.io/ML_course_maastricht/notebooks/LDAviz/index.html)
 
 
 # Embeddings (Bonus)
@@ -633,6 +630,7 @@ recipe_embedding %>% prep() %>% juice() %>%
 ```
 
 
+<!---
 * Same goes for UMAP, which can be accessd in recipes via the the package `embed` pckage.
 * However,`embed` is a bit heavy in terms of dependencies, since it uses `keras` and `tensorflow`, a deep learning framewok, in the backgroubnd, and is in need to install another mini-conda enviroment. 
 * If you have no experience with `keras` and `tensorflow` so far, I suggest you wait with this one until later sessions when we properly introduce it.
@@ -650,6 +648,8 @@ recipe_umap <- recipe_embedding %>%
 recipe_umap %>% prep() %>% juice() %>% 
   head(100)
 ```
+
+--->
 
 * So, that's all I have for now
 
