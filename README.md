@@ -1,6 +1,6 @@
 # Introduction to Machine Learning for Policy Analysis (Maastricht 2021)
 
-Dear Students, welcome to the course repository, where you will find all informations supplementing this terms machine learning course.
+Dear Students, welcome to the course repository, where you will find all informations supplementing this term's machine learning for policy analysis course. Here you will find the lectures on the two topics introduced (Supervised MAchine LEarning & NAtural LAnguage Processing) in video format plus facilitating rmarkdown notebooks.
 
 
 
@@ -14,6 +14,8 @@ Legend:
 
 ## Introduction to Supervised Machine Learning (S-ML) in R
 
+This part will introduce you to the fundamentals of supervised machine learning (SML, aka. predictive modelling), and illustrate practical applications theeof in R.
+
 * T: Introduction to supervised ML 
  [ ::> Video 1: Introduction & Statistics Refresher <:: ](https://www.loom.com/share/1092fff1eb8843a0b084618a8118c3db) 
  [ ::> Video 2: Generalization, Hyperparameter Tuning & Model Clases <:: ](https://www.loom.com/share/b985e4e058b6459f955bf6280d3ad560)
@@ -26,6 +28,8 @@ Legend:
  [ ::> Colab <:: ](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/Notebooks/SML_application_R.ipynb)
 
 ## Introduction to Natural-Language-Processing (NLP) in R
+
+In this part you will be introduced to the fundamentals of analysing textual data, and the practical application in R. After reviwing the basics of string manipulation, we will move to bag-of-word style text summaries, and move on to slightly more advanced applications such as sentiment analysis and topic modelling.
 
  * A: Basics of text analysis in R 
   [ ::> Video 1: Introduction to text analysis in R <:: ](https://www.loom.com/share/5648ecba2c26429aaebcda7ba8ffb83a?from_recorder=1) 
@@ -55,7 +59,7 @@ Legend:
 ## Natural Language Processing
 
 
-## Forther topics of (potential) interest
+## Further topics of (potential) interest
 
 * [Fundamentals of Data Visualization (O'Reily)](https://serialmentor.com/dataviz/)
 * [Data Visualization (R): A practical introduction](https://socviz.co/index.html)
