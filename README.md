@@ -90,10 +90,18 @@ As a bonus, find some very basic introductions to working with data in R (from a
  [ ::> Video <:: ](https://www.loom.com/share/06497181712a4fbf9bf4443d85926a35) 
  [ ::> Html <:: ](https://sds-aau.github.io/SDS-master/M1/notebooks/DS_basics_data_manipulation_application_R.nb.html) 
  [ ::> Colab <::](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/DS_basics_data_manipulation_application_R.ipynb#offline=true&sandboxMode=true)
-* E: Data manipulation basic exercises 
+* T: Data Visualization 
+ [ ::> Video <:: ](https://www.loom.com/share/73c049cd420d46f3b1129944b0e9e6ea) 
+ [ ::> Slides <:: ](https://sds-aau.github.io/SDS-master/M1/notebooks/EDA_dataviz_intro.html)
+* A: BAsic data visualization in NR using ggplot 
+ [ ::> Video 1 <:: ](https://www.loom.com/share/c1b84f6e59ce4b02935b0088744cfc5b) 
+ [ ::> Html <:: ](https://sds-aau.github.io/SDS-master/M1/notebooks/EDA_dataviz_application_R.nb.html) 
+ [ ::> Colab <:: ](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/EDA_dataviz_application_R.ipynb)
+* E: Data manipulation & visualization basic exercises 
  [ ::> 1: Basics <::](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/exercises/DS_basics_data_manipulation_application_R_ex1.ipynb) 
  [ ::> 2: Joins <:: ](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/exercises/DS_basics_data_manipulation_application_R_ex2.ipynb) 
- [::> 3: Challange <::](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/exercises/DS_basics_data_manipulation_application_R_ex3.ipynb)
+ [ ::> 3: Data Manipulation Challange <:: ](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M1/notebooks/exercises/DS_basics_data_manipulation_application_R_ex3.ipynb)
+ [ ::> 4 EDA & Dataviz <:: ](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/notebooks/exercises/M1/notebooks/exercises/EDA_dataviz_application_R_ex1.ipynb)
 
 
 
