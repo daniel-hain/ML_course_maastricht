@@ -1,6 +1,6 @@
 # Introduction to Machine Learning for Policy Analysis (Maastricht 2021)
 
-Dear Students, welcome to the course repository, where you will find all informations supplementing this term's machine learning for policy analysis course. Here you will find the lectures on the two topics introduced (Supervised MAchine LEarning & NAtural LAnguage Processing) in video format plus facilitating rmarkdown notebooks.
+Dear Students, welcome to the course repository, where you will find all informations supplementing this term's machine learning for policy analysis course. Here you will find the lectures on the two topics introduced (Supervised Machine LEarning & Natural Language Processing) in video format plus facilitating rmarkdown notebooks.
 
 
 
