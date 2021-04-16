@@ -100,23 +100,28 @@ Note: In the [Notebooks](https://github.com/daniel-hain/ML_course_2020_maastrich
 
 # Further Resources
 
-## Tutorials & Knowledge
+## Data Science in R in general
 
-### general 
+* Wickham, H., & Grolemund, G. (2016). R for data science: import, tidy, transform, visualize, and model data. O'Reilly Media, Inc. [Online available here](https://r4ds.had.co.nz/)
+* Baumer, B., Kaplan, D. & Horton, N. (2020) Modern Data Science with R (2nd Ed.). CRC Press [Online available here](https://beanumber.github.io/mdsr2e/)
 
-* [Fundamentals of Data Visualization (O'Reily)](https://serialmentor.com/dataviz/)
+## Supervised Machine Learning
+
+* Kuhn, M., Silge, J. (2020) Tidy Modeling with R [Online available here](https://www.tmwr.org/)
+* [Supervised Machine Learning Case Studies in R (Julia Sigle)](https://supervised-ml-course.netlify.app/)
 * [Feature Engineering and Selection: A Practical Approach for Predictive Models (Max Kuhn)](https://bookdown.org/max/FES/)
 
-### Datascience in R
+## Natural Language Processing
 
-* [Supervised Machine Learning Case Studies in R (Julia Sigle)](https://supervised-ml-course.netlify.app/)
-* [R for Data Science (Hadley)](https://r4ds.had.co.nz/)
-* [Introduction to Data Science (Rafael A. Irizarry)](https://rafalab.github.io/dsbook/)
-* [Stats 432: R for Statistical Learning (UI)](https://daviddalpiaz.github.io/r4sl/)
-* [Stats 545: Data wrangling, exploration, and analysis with R (UBC)](https://stat545.com/)
-* [Forecasting in R: Principles and Practice](https://otexts.com/fpp2/)
-* [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
-* [Efficient R Programming](https://csgillespie.github.io/efficientR/)
-* [Functional Programming in R (Stanford, Hadley)](https://dcl-prog.stanford.edu/)
+
+## Forther topics of (potential) interest
+
+* [Fundamentals of Data Visualization (O'Reily)](https://serialmentor.com/dataviz/)
 * [Data Visualization (R): A practical introduction](https://socviz.co/index.html)
 * [Exploring Enterprise Databases with R](https://smithjd.github.io/sql-pet/)
+* [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+* [Efficient R Programming](https://csgillespie.github.io/efficientR/)
+
+
+
+
