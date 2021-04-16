@@ -25,10 +25,16 @@ Legend:
 
 # Introduction to Natural-Language-Processing (NLP) in R
 
- * R: Video [1: Introduction to text analysis in R](https://www.loom.com/share/5648ecba2c26429aaebcda7ba8ffb83a?from_recorder=1) [Html](https://sds-aau.github.io/SDS-master/M2/notebooks/NLP_intro_R.nb.html) [Colab comming soon](https://colab.research.google.com/github/SDS-AAU/SDS-master/blob/master/M2/notebooks/NLP_intro_R.ipynb)
-* Application: Working with long text and extracting text elements Video [1: Preprocessing & Sentiments](https://www.loom.com/share/693668d74ce74697870fd97a8256d682?from_recorder=1)[2: Entity extraction](https://www.loom.com/share/647407c8959a4702b14c7db8dcf055f0?from_recorder=1) [Html](https://sds-aau.github.io/SDS-master/M2/notebooks/NLP_long_text_R.nb.html)
-  
-* Application: Vectorization and Topic Modelling [Video](https://www.loom.com/share/e9e054a738f3472983c905b1b739b9c3) [Html](https://sds-aau.github.io/SDS-master/M2/notebooks/NLP_text_vectorization_R.nb.html)
+ * A: Basics of text analysis in R 
+  [ ::> Video 1: Introduction to text analysis in R <:: ](https://www.loom.com/share/5648ecba2c26429aaebcda7ba8ffb83a?from_recorder=1) 
+  [ ::> Html <::](https://sds-aau.github.io/SDS-master/M2/notebooks/NLP_intro_R.nb.html) 
+* A: Working with long text and extracting text elements Vin R 
+ [ ::> Video 1: Preprocessing & Sentiments <:: ](https://www.loom.com/share/693668d74ce74697870fd97a8256d682?from_recorder=1)
+ [ ::> Video 2: Entity extraction](https://www.loom.com/share/647407c8959a4702b14c7db8dcf055f0?from_recorder=1) 
+ [ ::> Html <::](https://sds-aau.github.io/SDS-master/M2/notebooks/NLP_long_text_R.nb.html) 
+* A: Text Vectorization and Topic Modelling in R 
+ [ ::> Video 1 <:: ](https://www.loom.com/share/e9e054a738f3472983c905b1b739b9c3) 
+ [ ::> Html <:: ](https://sds-aau.github.io/SDS-master/M2/notebooks/NLP_text_vectorization_R.nb.html)
 
 # R Brush-up (Bonus)
 
