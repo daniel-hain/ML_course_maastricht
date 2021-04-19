@@ -6,11 +6,15 @@ output:
   html_notebook:
     code_folding: show
     df_print: paged
-    toc: true
+    toc: yes
     toc_depth: 2
     toc_float:
-      collapsed: false
+      collapsed: no
     theme: flatly
+  html_document:
+    toc: yes
+    toc_depth: '2'
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -516,7 +520,9 @@ json_lda %>% serVis() # For direct output
 ```
 
 
-<iframe width="1200" height="1500" src="https://daniel-hain.github.io/ML_course_maastricht/notebooks/LDAviz/index.html" frameborder="0"></iframe> 
+<iframe width="1000" height="1000" src="https://daniel-hain.github.io/ML_course_maastricht/notebooks/LDAviz/index.html#topic=0&lambda=1&term="> 
+<p>Your browser does not support iframes</p>
+</iframe> 
 
 Didnt really figure out how to embedd the resulting plot, but the outcome can be seen [here](https://daniel-hain.github.io/ML_course_maastricht/notebooks/LDAviz/index.html)
 
@@ -536,7 +542,7 @@ Didnt really figure out how to embedd the resulting plot, but the outcome can be
 library(textdata)
 
 glove6b <- embedding_glove6b(dimensions = 100)
-glove6b
+glove6b %>% head(1000)
 ```
 
 
