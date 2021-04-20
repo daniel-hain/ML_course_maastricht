@@ -4,9 +4,9 @@ Dear Students, welcome to the course repository, where you will find all informa
 
 To get the most out of this lectures, I expect you to have R & R-Studio installed and updated on your local machine, and to be generally used to do data analytics in R using the ´tidyverse´ ecosystem. If that is not the case, you might want to take a look at the adittional resoures such as ´My R Brush-up course (Bonus)´ below, where I recap the fundamentals of working with data in R.
 
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
-[:::::::> Watch this intro video to get started <::::::::::](https://www.loom.com/share/667fa577b4f94f44a0acdd29cdbd3943) 
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+[::::::::::::::> Watch this intro video to get started <:::::::::::::::::](https://www.loom.com/share/667fa577b4f94f44a0acdd29cdbd3943) 
+
 
 # Lectures
 
