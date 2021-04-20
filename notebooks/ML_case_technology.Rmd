@@ -455,6 +455,25 @@ text_own = tibble(text = 'This device is going to save the world that includes a
 fit_en %>% predict(new_data = data_recipe %>% bake(text_own))
 ```
 
+```{r}
+text_cordis <- read_csv('https://github.com/SDS-AAU/SDS-master/raw/master/M2/data/cordis-h2020reports.gz') 
+```
+
+```{r}
+pred_cordis <- tibble(pred = fit_en %>% predict(new_data = data_recipe %>% bake(text_cordis %>% rename(text = summary) %>% select(text))) %>% pull(.pred_class),
+                      pred_prob = fit_en %>% predict(new_data = data_recipe %>% bake(text_cordis %>% rename(text = summary) %>% select(text)), type = "prob") %>% pull(.pred_TRUE))
+
+```
+```{r}
+text_cordis %>%
+  bind_cols(pred_cordis) %>%
+  arrange(desc(pred_prob)) %>%
+  select(projectAcronym, title, pred) %>%
+  slice(1:2)
+```
+
+
+
 
 # Endnotes
 
