@@ -48,8 +48,7 @@ Welcome to todays session.
 
 * So, let's start the fun. 
 * I for you extracted Chinese patents from our EPO [PATSTAT](https://www.epo.org/searching-for-patents/business/patstat.html) databases filed at either the EPO or the USTPO. 
-* I further provide you adittional data to be found in PATSTAT. 
-
+* I further provide you additional data to be found in PATSTAT. 
 
 
 ```{r}
@@ -64,7 +63,7 @@ pat_cpc <- readRDS(url("https://github.com/daniel-hain/ML_course_maastricht/raw/
 patents %<>% filter(appln_filing_year >= 2013)
 ```
 
-* Filter for only patents whith entry in main data table
+* Filter for only patents with entry in main data table
 
 ```{r}
 pat_abstr %<>% semi_join(patents, by = 'appln_id')
@@ -96,6 +95,8 @@ patents %>% skimr::skim()
 
 ## Patent CPC Class
 
+* The Cooperative Patent Classification (CPC) assigns patents to technology classes
+
 ```{r}
 pat_cpc %>% glimpse()
 ```
@@ -112,12 +113,14 @@ pat_cpc %>%
 
 ## Patent Abstracts
 
+* The patent abstract briefly summarizes the content of the patent. This is what we will use for our clasifiction exercise later
+
 ```{r}
 pat_abstr %>% glimpse()
 ```
 
 ```{r}
-pat_abstr %>% select(-appln_id) %>% head()
+pat_abstr %>% select(-appln_id) %>% head(3)
 ```
 
 # Exploratory Analysis
@@ -134,7 +137,7 @@ We now aim at identifying renewable energy patents. This could be the starting p
 1. Could we develop a model that detects renewable energy patents based on their abstract?
 
 * We exploit the WIPOs Y-tag. 
-* Here, the WIPO labels patents identified to be related to renewable energy with the adittional CPC class assignment `Y02` which helps us to easily identify them. 
+* Here, the WIPO labels patents identified to be related to renewable energy with the additional CPC class assignment `Y02` which helps us to easily identify them. 
 * Check [here](https://www.gonst.lu.se/article/report-on-green-patents) for further information.
 
 Lets identify renewable energy patents.
@@ -172,7 +175,7 @@ Most language analysis approaches are based on the analysis of texts word-by-wor
 
 Different forms of analysis (and the packages used therefore) favor different structures, so we need to be fluent in transfering original raw-text in these formats, as well as switching between them. (for more infos, check [here](https://www.tidytextmining.com/dtm.html)).
 
-![](https://www.dropbox.com/s/ou05c8np4j47r0q/nlp_tidyworkflow.png?dl=1)
+![](https://sds-aau.github.io/SDS-master/00_media/nlp_tidyworkflow.png)
 
 ```{r}
 library(tidytext)
@@ -180,15 +183,10 @@ library(tidytext)
 
 ## Tidy Text Formats
 
-```{r}
-pat_abstr %<>%
-  left_join(patents %>% select(appln_id, y_tag), by = "appln_id")
-```
-
+* To explore the text a bit, lets bring it into a tidy format
 
 ```{r}
 pat_abstr_tidy <- pat_abstr %>%
-  select(appln_id, y_tag, appln_abstract) %>%
   unnest_tokens(output = word, 
                 input = appln_abstract, 
                 token = "words",
@@ -196,11 +194,7 @@ pat_abstr_tidy <- pat_abstr %>%
                 drop = TRUE)
 ```
 
-
-```{r}
-pat_abstr_tidy %>%
-  head()
-```
+* And do the usual preprocessing
 
 ```{r}
  pat_abstr_tidy %<>%
@@ -212,6 +206,8 @@ pat_abstr_tidy %>%
   anti_join(get_stopwords()) 
 ```
 
+* MAke a bag-of-words model with TFIDF weights
+
 ```{r}
 pat_abstr_tidy %<>%
   add_count(appln_id, word) %>%
@@ -220,6 +216,16 @@ pat_abstr_tidy %<>%
               n = n)
 ```
 
+* Lets merge the created Y-tag to teh abstracts
+
+```{r}
+pat_abstr_tidy %<>%
+  left_join(patents %>% select(appln_id, y_tag), by = "appln_id") %>%
+  relocate(appln_id, y_tag)
+```
+
+* ANd see what we got
+
 ```{r}
 pat_abstr_tidy %>%
   head()
@@ -227,9 +233,11 @@ pat_abstr_tidy %>%
 
 ```{r}
 pat_abstr_tidy %>%
-  count(word, wt = tf_idf) %>%
-  top_n(n, 20)
+  count(word, wt = tf_idf, sort = TRUE) %>%
+  head(50)
 ```
+
+* Do patents with Y tgs use distinct vocabulary?
 
 ```{r}
 pat_ytag_words <- pat_abstr_tidy %>%
@@ -273,20 +281,27 @@ pat_dtm %<>%
 ```
 
 ```{r}
-pat_dtm %>% 
-  head()
+pat_dtm %>% head()
 ```
 
+* We could straight put this matrix into a model
 * However, there are easier ways to do so, if the purpose is to create a predictive model.
+
+```{r}
+rm(pat_dtm)
+```
+
 
 # Building a predictive model
 
 ```{r}
 data <- pat_abstr %>%
+  inner_join(patents %>% select(appln_id, y_tag), by = "appln_id") %>%
   select(y_tag, appln_abstract) %>%
   rename(y = y_tag, text = appln_abstract) %>%
   mutate(y = y %>% as_factor()) %>%
-  mutate(text = text %>% str_to_lower() %>% str_remove_all('[^[:alnum:] ]'))
+  mutate(text = text %>% str_to_lower() %>% str_remove_all('[^[:alnum:] ]')) %>%
+  drop_na()
 ```
 
 
@@ -299,6 +314,8 @@ data %>% skimr::skim()
 ## Training & Test split
 
 ```{r}
+set.seed(1337)
+
 data_split <- initial_split(data, prop = 0.75, strata = y)
 
 data_train <- data_split  %>%  training()
@@ -322,12 +339,14 @@ data_recipe <- data_train %>%
   step_tokenfilter(text, min_times = 100) %>%  # filter sparse terms
   step_stopwords(text, keep = FALSE) %>% # Filter stopwords
   step_tfidf(text) %>% # tfidf weighting
-  prep()
+  # step_knnimpute(all_predictors()) %>% #  knn inputation of missing values Not necessary here
+  prep() # !!! NOTE: Only prep() the recipe if you dont want to use it in a workflow, otherwise there might b ussues
 ```
 
 ```{r}
 data_recipe
 ```
+* Since we do not use any workflows lter, we can directly prepare the test and training data
 
 ```{r}
 data_train_prep <- data_recipe %>% juice()
@@ -337,9 +356,9 @@ data_test_prep <- data_recipe %>% bake(data_test)
 
 ## Defining the models
 
-
-
 ```{r}
+# # Use this code in case you want to do parallel processing
+
 # library(doParallel)
 # all_cores <- parallel::detectCores(logical = FALSE)
 
@@ -376,7 +395,8 @@ pred_collected <- tibble(
 ```
 
 ```{r}
-pred_collected %>% conf_mat(truth, pred)
+pred_collected %>% conf_mat(truth, pred) 
+pred_collected %>% conf_mat(truth, pred) %>% autoplot()
 ```
 
 ```{r}
@@ -385,9 +405,8 @@ pred_collected %>% conf_mat(truth, pred) %>% summary()
 
 
 # Model explainability
-Machine learning (ML) models are often considered black boxes due to their complex inner-workings. More advanced ML models such as random forests, gradient boosting machines (GBM), artificial neural networks (ANN), among others are typically more accurate for predicting nonlinear, faint, or rare phenomena. Unfortunately, more accuracy often comes at the expense of interpretability, and interpretability is crucial for business adoption, model documentation, regulatory oversight, and human acceptance and trust. Luckily, several advancements have been made to aid in interpreting ML models.
 
-![](https://www.dropbox.com/s/r5w3o80q3k3prdm/interpret.png?dl=1){width=750px}
+Machine learning (ML) models are often considered black boxes due to their complex inner-workings. More advanced ML models such as random forests, gradient boosting machines (GBM), artificial neural networks (ANN), among others are typically more accurate for predicting nonlinear, faint, or rare phenomena. Unfortunately, more accuracy often comes at the expense of interpretability, and interpretability is crucial for business adoption, model documentation, regulatory oversight, and human acceptance and trust. Luckily, several advancements have been made to aid in interpreting ML models.
 
 Moreover, it's often important to understand the ML model that you've trained on a global scale, and also to zoom into local regions of your data or your predictions and derive local explanations. 
 
@@ -396,6 +415,7 @@ Moreover, it's often important to understand the ML model that you've trained on
 
 
 ## Global explanation
+
 Finally, let's get a feeling what variables the models mostly draw from. There are numerous ways for such inspections, in which we will dewll deeper in later lectures. Here, I just want to present the most intuitive and common one, **Variable Importance**.
 
 Most (but not all) model classes offer some possibility to derive measures of variable importance. Note, this is currently not implemented for SVMs. Again, in most ML models and setups, these meastures are nice to give a rough intuition, but CANNOT be interpreted as constant marginal effects, left alone causal.
@@ -416,6 +436,7 @@ In complex nonparametric models, it is often more helpful to get explanations wh
 BTW: The original paper is mindblowing, if you find time, just read it!
 
 * Marco Tulio Ribeiro, Sameer Singh, and Carlos Guestrin. 2016. ""hy Should I Trust You?: Explaining the Predictions of Any Classifier." In Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD 2016). ACM, New York, NY, USA, 1135-1144. DOI: https://doi.org/10.1145/2939672.2939778
+
 ```{r}
 library(lime)
 ```
@@ -441,7 +462,7 @@ explanation %>% plot_features()
 
 
 
-### Bonus: Own predictions
+# Bonus: Own predictions
 
 * We could also just apply the model to some own text and see how it predicts...
 
@@ -464,12 +485,13 @@ pred_cordis <- tibble(pred = fit_en %>% predict(new_data = data_recipe %>% bake(
                       pred_prob = fit_en %>% predict(new_data = data_recipe %>% bake(text_cordis %>% rename(text = summary) %>% select(text)), type = "prob") %>% pull(.pred_TRUE))
 
 ```
+
 ```{r}
 text_cordis %>%
   bind_cols(pred_cordis) %>%
   arrange(desc(pred_prob)) %>%
   select(projectAcronym, title, pred) %>%
-  slice(1:2)
+  head(50)
 ```
 
 
