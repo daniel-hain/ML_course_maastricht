@@ -64,7 +64,7 @@ In this part you will be introduced to the fundamentals of analysing textual dat
 
  * A: Case study: Using NLP and ML to predict green patents 
  [::> Video 1 <::](hhttps://www.loom.com/share/1cfa629df60f452eb23dd44b307e9e57) 
-  [ ::> Html <::](https://daniel-hain.github.io/ML_course_maastricht/notebooks/ML_case_technology.nb.html) 
+ [ ::> Html <::](https://daniel-hain.github.io/ML_course_maastricht/notebooks/ML_case_technology.nb.html) 
 
 
 
