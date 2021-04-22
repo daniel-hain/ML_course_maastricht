@@ -8,11 +8,11 @@ To get the most out of this lectures, I expect you to have R & R-Studio installe
 
 [::::::::::::::> Watch this intro video to get started <:::::::::::::::::](https://www.loom.com/share/667fa577b4f94f44a0acdd29cdbd3943) 
 
-## Lecturer
+## Lecturer (briefly about me)
 
 ![](https://daniel-hain.github.io/media/me.jpg)
 
-Daniel is an Associate Professor in Data Science & Innovation Economics at the Aalborg University Business School, where he leads the Data Science research track at the [AI:Growth lab](https://www.business.aau.dk/research/ai-growth-lab/). His research is dedicated to the development and application of data-driven methods to map, understand, and predict technological change, and its causes and consequences for socioeconomic systems on various levels of aggregation. His current contextual focus is the dynamics of AI research and industry. 
+Daniel is an Associate Professor in Data Science & Innovation Economics at the Aalborg University Business School, where he leads the Data Science research track at the [AI:Growth lab](https://www.business.aau.dk/research/ai-growth-lab/), and coordinates teaching at the [Social Data Science (SDS)](https://www.sds.aau.dk/) master specialization.. His research is dedicated to the development and application of data-driven methods to map, understand, and predict technological change, and its causes and consequences for socioeconomic systems on various levels of aggregation. His current contextual focus is the dynamics of AI research and industry. 
 
 His research is featured in leading academic journals such as Research Policy, but also attracted attention and funding from the industry, and lead to price-winning applications. Daniel is actively engaged in initiatives to educate (social science) students and researchers, professionals, and policymakers in understanding, evaluating, and applying modern Data Science and Artificial Intelligence methods for data-driven decision making. 
 
