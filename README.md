@@ -1,11 +1,26 @@
 # Introduction to Machine Learning for Policy Analysis (Maastricht 2021)
 
+## Welcome
+
 Dear Students, welcome to the course repository, where you will find all informations supplementing this term's machine learning for policy analysis course. Here you will find the lectures on the two topics introduced (Supervised Machine Learning & Natural Language Processing) in video format plus facilitating rmarkdown notebooks.
 
 To get the most out of this lectures, I expect you to have R & R-Studio installed and updated on your local machine, and to be generally used to do data analytics in R using the ´tidyverse´ ecosystem. If that is not the case, you might want to take a look at the adittional resoures such as ´My R Brush-up course (Bonus)´ below, where I recap the fundamentals of working with data in R.
 
-
 [::::::::::::::> Watch this intro video to get started <:::::::::::::::::](https://www.loom.com/share/667fa577b4f94f44a0acdd29cdbd3943) 
+
+## Lecturer
+
+![](https://daniel-hain.github.io/media/me.jpg)
+
+Daniel is an Associate Professor in Data Science & Innovation Economics at the Aalborg University Business School, where he leads the Data Science research track at the [AI:Growth lab](https://www.business.aau.dk/research/ai-growth-lab/). His research is dedicated to the development and application of data-driven methods to map, understand, and predict technological change, and its causes and consequences for socioeconomic systems on various levels of aggregation. His current contextual focus is the dynamics of AI research and industry. 
+
+His research is featured in leading academic journals such as Research Policy, but also attracted attention and funding from the industry, and lead to price-winning applications. Daniel is actively engaged in initiatives to educate (social science) students and researchers, professionals, and policymakers in understanding, evaluating, and applying modern Data Science and Artificial Intelligence methods for data-driven decision making. 
+
+As part of the [AI:DK](https://aidenmark.dk/) project, he coordinates and leads AI proof-of-concept projects within industry. His team also develops enterprise and policy software solutions for IP search and technology mapping.
+
+* [Website](https://daniel-hain.github.io)
+* [Github](https://github.com/daniel-hain)
+* [Google Scholar](https://scholar.google.dk/citations?user=7C8kR8EAAAAJ&hl=en&oi=ao)
 
 
 # Lectures
