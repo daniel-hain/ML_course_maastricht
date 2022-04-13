@@ -60,13 +60,14 @@ In this part you will be introduced to the fundamentals of analysing textual dat
  [ ::> Video 1 <:: ](https://www.loom.com/share/e9e054a738f3472983c905b1b739b9c3) 
  [ ::> Html <:: ](https://daniel-hain.github.io/ML_course_maastricht/notebooks/NLP_text_vectorization_R.nb.html)
 
+<!---
 # Live Workshop
 
  * A: Case study: Using NLP and ML to predict green patents 
  [::> Video 1 <::](https://www.loom.com/share/1cfa629df60f452eb23dd44b307e9e57?sharedAppSource=personal_library) 
  [ ::> Html <::](https://daniel-hain.github.io/ML_course_maastricht/notebooks/ML_case_technology.nb.html) 
 
-
+--->
 
 
 # Further Resources
