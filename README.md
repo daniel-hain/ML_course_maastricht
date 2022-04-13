@@ -21,6 +21,9 @@ As part of the [AI:DK](https://aidenmark.dk/) project, he coordinates and leads 
 * [Website](https://daniel-hain.github.io)
 * [Github](https://github.com/daniel-hain)
 * [Google Scholar](https://scholar.google.dk/citations?user=7C8kR8EAAAAJ&hl=en&oi=ao)
+* [Twitter](https://twitter.com/Daniel_S_Hain)
+* [LinkedIn](https://www.linkedin.com/in/daniel-s-hain/)
+
 
 
 # Lectures
