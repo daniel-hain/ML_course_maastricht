@@ -92,9 +92,15 @@ Find below a list of sfurther resources (including own material), either to brus
 
 ## Natural Language Processing
 
-* [Hain, Daniel, et al. "Text-based Technological Signatures and Similarities: How to create them and what to do with them." arXiv preprint arXiv:2003.12303 (2020)](https://arxiv.org/pdf/2003.12303.pdf): Own paper, where we introduce to text embeddings and use it to map technology based on patent data.
 * [Julia Silge and David Robinson (2020). Text Mining with R: A Tidy Approach, O’Reilly.](https://www.tidytextmining.com/): Great introduction to the `tidytext` ecosystem and NLP in R by the package makers.
 * [Emil Hvidfeldt and Julia Silge (2020). Supervised Machine Learning for Text Analysis in R](https://smltar.com/): More advanced introduction to SML based on textual data.
+
+## Technology forecasting with ML & NLP
+
+* [Hain, Daniel, et al. Hain, D. S., Jurowetzki, R., Buchmann, T., & Wolf, P. (2022). A text-embedding-based approach to measuring patent-to-patent technological similarity. Technological Forecasting and Social Change, 177, 121559.](https://doi.org/10.1016/j.techfore.2022.121559): Own paper, where we introduce to text embeddings and use it to map technology based on patent data.
+* [Bekamiri, H., Hain, D. S., & Jurowetzki, R. (2021). PatentSBERTa: A Deep NLP based Hybrid Model for Patent Distance and Classification using Augmented SBERT. arXiv preprint arXiv:2103.11933.](https://arxiv.org/pdf/2103.11933.pdf): More advanced version of the use of embeddings on. 
+* [Hain, Daniel, et al. Hain, D. S., Jurowetzki, R., Buchmann, T., & Wolf, P. (2022). A text-embedding-based approach to measuring patent-to-patent technological similarity. Technological Forecasting and Social Change, 177, 121559.](https://doi.org/10.1016/j.techfore.2022.121559): Own paper, where we introduce to text embeddings and use it to map technology based on patent data.patents.
+* [Hain, D. S., Jurowetzki, R., Konda, P., & Oehler, L. (2020). From catching up to industrial leadership: towards an integrated market-technology perspective. An application of semantic patent-to-patent similarity in the wind and EV sector. Industrial and Corporate Change, 29(5), 1233-1255.](https://doi.org/10.1093/icc/dtaa021): Application of the technique.
 
 
 ## Further topics of (potential) interest
