@@ -39,17 +39,15 @@ pacman::p_load(tidyverse,
                )
 ```
 
-
-Welcome to todays session. 
+Welcome to todays session.
 
 # Exploring Chinese Patent Data
 
 ## Introduction
 
-* So, let's start the fun. 
-* I for you extracted Chinese patents from our EPO [PATSTAT](https://www.epo.org/searching-for-patents/business/patstat.html) databases filed at either the EPO or the USTPO. 
-* I further provide you additional data to be found in PATSTAT. 
-
+-   So, let's start the fun.
+-   I for you extracted Chinese patents from our EPO [PATSTAT](https://www.epo.org/searching-for-patents/business/patstat.html) databases filed at either the EPO or the USTPO.
+-   I further provide you additional data to be found in PATSTAT.
 
 ```{r}
 patents <- readRDS(url("https://github.com/daniel-hain/ML_course_maastricht/raw/master/data/CN_patent.rds?raw=true"))
@@ -57,19 +55,18 @@ pat_abstr <- readRDS(url("https://github.com/daniel-hain/ML_course_maastricht/ra
 pat_cpc <- readRDS(url("https://github.com/daniel-hain/ML_course_maastricht/raw/master/data/CN_el_cpc.rds?raw=true"))
 ```
 
-* Filter for post-2013
+-   Filter for post-2013
 
 ```{r}
 patents %<>% filter(appln_filing_year >= 2013)
 ```
 
-* Filter for only patents with entry in main data table
+-   Filter for only patents with entry in main data table
 
 ```{r}
 pat_abstr %<>% semi_join(patents, by = 'appln_id')
 pat_cpc %<>% semi_join(patents, by = 'appln_id')
 ```
-
 
 ## Patent main data
 
@@ -83,11 +80,11 @@ patents %>% glimpse()
 
 This main dataset contains all Patents in the 2000-2015 period with Chinese inventors, filed at the USTPO or EPO. I only included priority (earliest) patent applications which got granted up to now. We have the following variables:
 
-* `appln_id`: PATSTAT id, unique identifier of patent application
-* `appln_filing_year`: Filing year of first priority
-* `docdb_family_size`: Size of the (simple) patent family
-* `nb_citing_docdb_fam`: Number of citations recieved by the patent family
-* `nb_inventors`: Number of inventors
+-   `appln_id`: PATSTAT id, unique identifier of patent application
+-   `appln_filing_year`: Filing year of first priority
+-   `docdb_family_size`: Size of the (simple) patent family
+-   `nb_citing_docdb_fam`: Number of citations recieved by the patent family
+-   `nb_inventors`: Number of inventors
 
 ```{r}
 patents %>% skimr::skim()
@@ -95,7 +92,7 @@ patents %>% skimr::skim()
 
 ## Patent CPC Class
 
-* The Cooperative Patent Classification (CPC) assigns patents to technology classes
+-   The Cooperative Patent Classification (CPC) assigns patents to technology classes
 
 ```{r}
 pat_cpc %>% glimpse()
@@ -113,7 +110,7 @@ pat_cpc %>%
 
 ## Patent Abstracts
 
-* The patent abstract briefly summarizes the content of the patent. This is what we will use for our clasifiction exercise later
+-   The patent abstract briefly summarizes the content of the patent. This is what we will use for our clasifiction exercise later
 
 ```{r}
 pat_abstr %>% glimpse()
@@ -127,18 +124,18 @@ pat_abstr %>% select(-appln_id) %>% head(3)
 
 We could have so much fun here exploring Chinese patents, but we have no time. However, I do another more exploratory lecture on the ame dataset, feel free to check:
 
-* [Economic Geography & Patents](https://daniel-hain.github.io/SDC_IM/notebooks/S3_1_Economic_geography.html)
-* [Economic Complexity & Patents](https://daniel-hain.github.io/SDC_IM/notebooks/S3_2_Economic_complexity.html)
+-   [Economic Geography & Patents](https://daniel-hain.github.io/SDC_IM/notebooks/S3_1_Economic_geography.html)
+-   [Economic Complexity & Patents](https://daniel-hain.github.io/SDC_IM/notebooks/S3_2_Economic_complexity.html)
 
 # The Y Tag: How to identify renewable energy patents
 
-We now aim at identifying renewable energy patents. This could be the starting point for an interesting analysis on all kind of things, but we here went to ask the following question: 
+We now aim at identifying renewable energy patents. This could be the starting point for an interesting analysis on all kind of things, but we here went to ask the following question:
 
-1. Could we develop a model that detects renewable energy patents based on their abstract?
+1.  Could we develop a model that detects renewable energy patents based on their abstract?
 
-* We exploit the WIPOs Y-tag. 
-* Here, the WIPO labels patents identified to be related to renewable energy with the additional CPC class assignment `Y02` which helps us to easily identify them. 
-* Check [here](https://www.gonst.lu.se/article/report-on-green-patents) for further information.
+-   We exploit the WIPOs Y-tag.
+-   Here, the WIPO labels patents identified to be related to renewable energy with the additional CPC class assignment `Y02` which helps us to easily identify them.
+-   Check [here](https://www.gonst.lu.se/article/report-on-green-patents) for further information.
 
 Lets identify renewable energy patents.
 
@@ -162,16 +159,15 @@ patents %>% head()
 rm(pat_cpc)
 ```
 
-
 # Text analysis of patent data
 
 ## The R NLP ecosystem (Brief reminder)
 
 Most language analysis approaches are based on the analysis of texts word-by-word. Here, their order might matter (word sequence models) or not (bag-of-words models), but the smallest unit of analysis is usually the word. This is usually done in context of the document the word appeared in. Therefore, on first glance three types datastructures make sense:
 
-1. **Tidy:**  Approach, where data is served in a 2-column document-word format (e.g., `tidytext`)
-2. **Token lists:** Creation of special objects, saved as document-token lists or corpus (e.g., `tm`, `quanteda`)
-3. **Matrix:** Long approach, where data is served as document-term matrix, term-frequency matrix, etc.
+1.  **Tidy:** Approach, where data is served in a 2-column document-word format (e.g., `tidytext`)
+2.  **Token lists:** Creation of special objects, saved as document-token lists or corpus (e.g., `tm`, `quanteda`)
+3.  **Matrix:** Long approach, where data is served as document-term matrix, term-frequency matrix, etc.
 
 Different forms of analysis (and the packages used therefore) favor different structures, so we need to be fluent in transfering original raw-text in these formats, as well as switching between them. (for more infos, check [here](https://www.tidytextmining.com/dtm.html)).
 
@@ -183,7 +179,7 @@ library(tidytext)
 
 ## Tidy Text Formats
 
-* To explore the text a bit, lets bring it into a tidy format
+-   To explore the text a bit, lets bring it into a tidy format
 
 ```{r}
 pat_abstr_tidy <- pat_abstr %>%
@@ -194,7 +190,7 @@ pat_abstr_tidy <- pat_abstr %>%
                 drop = TRUE)
 ```
 
-* And do the usual preprocessing
+-   And do the usual preprocessing
 
 ```{r}
  pat_abstr_tidy %<>%
@@ -206,7 +202,7 @@ pat_abstr_tidy <- pat_abstr %>%
   anti_join(get_stopwords()) 
 ```
 
-* MAke a bag-of-words model with TFIDF weights
+-   MAke a bag-of-words model with TFIDF weights
 
 ```{r}
 pat_abstr_tidy %<>%
@@ -216,7 +212,7 @@ pat_abstr_tidy %<>%
               n = n)
 ```
 
-* Lets merge the created Y-tag to teh abstracts
+-   Lets merge the created Y-tag to teh abstracts
 
 ```{r}
 pat_abstr_tidy %<>%
@@ -224,7 +220,7 @@ pat_abstr_tidy %<>%
   relocate(appln_id, y_tag)
 ```
 
-* ANd see what we got
+-   ANd see what we got
 
 ```{r}
 pat_abstr_tidy %>%
@@ -237,7 +233,7 @@ pat_abstr_tidy %>%
   head(50)
 ```
 
-* Do patents with Y tgs use distinct vocabulary?
+-   Do patents with Y tags use distinct vocabulary?
 
 ```{r}
 pat_ytag_words <- pat_abstr_tidy %>%
@@ -257,13 +253,14 @@ pat_ytag_words %>%
   coord_flip() +
   scale_x_reordered()
 ```
+
 ## Towards a predictive model?
 
-* We see there seems to be quite a difference in the words used in Y-tagged renewable energy patents. 
-* Therefore it indeed might be possible to build a predictive model based on text...
-* How would we do that?
-* The easiest way would be to create a document-term-matrix, basically creating a dummy variable for every term.
-* We could do it a bit more sophisticated, and instead use the TFIDF weight.
+-   We see there seems to be quite a difference in the words used in Y-tagged renewable energy patents.
+-   Therefore it indeed might be possible to build a predictive model based on text...
+-   How would we do that?
+-   The easiest way would be to create a document-term-matrix, basically creating a dummy variable for every term.
+-   We could do it a bit more sophisticated, and instead use the TFIDF weight.
 
 ```{r}
 # only a small sample for illustration
@@ -284,13 +281,12 @@ pat_dtm %<>%
 pat_dtm %>% head()
 ```
 
-* We could straight put this matrix into a model
-* However, there are easier ways to do so, if the purpose is to create a predictive model.
+-   We could straight put this matrix into a model
+-   However, there are easier ways to do so, if the purpose is to create a predictive model.
 
 ```{r}
 rm(pat_dtm)
 ```
-
 
 # Building a predictive model
 
@@ -300,16 +296,13 @@ data <- pat_abstr %>%
   select(y_tag, appln_abstract) %>%
   rename(y = y_tag, text = appln_abstract) %>%
   mutate(y = y %>% as_factor()) %>%
-  mutate(text = text %>% str_to_lower() %>% str_remove_all('[^[:alnum:] ]')) %>%
-  drop_na()
+  mutate(text = text %>% str_to_lower() %>% str_remove_all('[^[:alnum:] ]') %>% str_squish()) %>%
+  drop_na() 
 ```
-
 
 ```{r}
 data %>% skimr::skim()
 ```
-
-
 
 ## Training & Test split
 
@@ -324,7 +317,7 @@ data_test <- data_split %>% testing()
 
 ## Preprocessing pipeline
 
-* While we up to now did all the NLP by hand, we can also just use the textrecipes package to automatize the workflow
+-   While we up to now did all the NLP by hand, we can also just use the textrecipes package to automatize the workflow
 
 ```{r}
 library(textrecipes)
@@ -333,8 +326,9 @@ library(textrecipes)
 ```{r}
 data_recipe <- data_train %>%
   recipe(y ~.) %>%
-  step_downsample(y) %>% # due to class imbalances
-  step_filter(text != "") %>% # remove 
+  themis::step_downsample(y) %>% # due to class imbalances%>%
+  step_filter(text != "")  %>%
+  # How textrecipes start
   step_tokenize(text) %>% # Tokenizing
   step_tokenfilter(text, min_times = 100) %>%  # filter sparse terms
   step_stopwords(text, keep = FALSE) %>% # Filter stopwords
@@ -346,13 +340,13 @@ data_recipe <- data_train %>%
 ```{r}
 data_recipe
 ```
-* Since we do not use any workflows lter, we can directly prepare the test and training data
+
+-   Since we do not use any workflows lter, we can directly prepare the test and training data
 
 ```{r}
 data_train_prep <- data_recipe %>% juice()
 data_test_prep <- data_recipe %>% bake(data_test)
 ```
-
 
 ## Defining the models
 
@@ -366,14 +360,12 @@ data_test_prep <- data_recipe %>% bake(data_test)
 #registerDoParallel(cl)
 ```
 
-
 ```{r}
 model_en <- logistic_reg(mode = 'classification', 
                          mixture = 0.25, 
                          penalty = 0.25) %>%
-  set_engine('glm', family = binomial) 
+  set_engine('glm', family = binomial()) 
 ```
-
 
 ## Define the workflow
 
@@ -385,7 +377,6 @@ We will skip the workflow step this time, since we do not evaluate different mod
 fit_en <- model_en %>% fit(formula = y ~., data = data_train_prep)
 ```
 
-
 ```{r}
 pred_collected <- tibble(
   truth = data_train_prep %>% pull(y),
@@ -396,29 +387,27 @@ pred_collected <- tibble(
 
 ```{r}
 pred_collected %>% conf_mat(truth, pred) 
-pred_collected %>% conf_mat(truth, pred) %>% autoplot()
+pred_collected %>% conf_mat(truth, pred) %>% autoplot(type = 'heatmap')
 ```
 
 ```{r}
 pred_collected %>% conf_mat(truth, pred) %>% summary()
 ```
 
-
 # Model explainability
 
 Machine learning (ML) models are often considered black boxes due to their complex inner-workings. More advanced ML models such as random forests, gradient boosting machines (GBM), artificial neural networks (ANN), among others are typically more accurate for predicting nonlinear, faint, or rare phenomena. Unfortunately, more accuracy often comes at the expense of interpretability, and interpretability is crucial for business adoption, model documentation, regulatory oversight, and human acceptance and trust. Luckily, several advancements have been made to aid in interpreting ML models.
 
-Moreover, it's often important to understand the ML model that you've trained on a global scale, and also to zoom into local regions of your data or your predictions and derive local explanations. 
+Moreover, it's often important to understand the ML model that you've trained on a global scale, and also to zoom into local regions of your data or your predictions and derive local explanations.
 
-* **Global interpretations** help us understand the inputs and their entire modeled relationship with the prediction target, but global interpretations can be highly approximate in some cases. 
-* **Local interpretation** help us understand model predictions for a single row of data or a group of similar rows.
-
+-   **Global interpretations** help us understand the inputs and their entire modeled relationship with the prediction target, but global interpretations can be highly approximate in some cases.
+-   **Local interpretation** help us understand model predictions for a single row of data or a group of similar rows.
 
 ## Global explanation
 
-Finally, let's get a feeling what variables the models mostly draw from. There are numerous ways for such inspections, in which we will dewll deeper in later lectures. Here, I just want to present the most intuitive and common one, **Variable Importance**.
+Finally, let's get a feeling what variables the models mostly draw from. There are numerous ways for such inspections, in which we will just scratch the surface here. Here, I just want to present the most intuitive and common one, **Variable Importance**.
 
-Most (but not all) model classes offer some possibility to derive measures of variable importance. Note, this is currently not implemented for SVMs. Again, in most ML models and setups, these meastures are nice to give a rough intuition, but CANNOT be interpreted as constant marginal effects, left alone causal.
+Most (but not all) model classes offer some possibility to derive measures of variable importance. Note, this is currently not implemented for SVMs. Again, in most ML models and setups, these measures are nice to give a rough intuition, but CANNOT be interpreted as constant marginal effects, left alone causal.
 
 ```{r}
 library(vip)
@@ -429,13 +418,14 @@ vip(fit_en) + ggtitle("VarImp: Elastic Net")
 ```
 
 ## Local interpretations
-In complex nonparametric models, it is often more helpful to get explanations why a certain datapoint is classified in the way it is than to look at the overall importance of variables. 
+
+In complex nonparametric models, it is often more helpful to get explanations why a certain datapoint is classified in the way it is than to look at the overall importance of variables.
 
 **Local Interpretable Model-agnostic Explanations** (LIME) is a visualization technique that helps explain individual predictions. As the name implies, it is model agnostic so it can be applied to any supervised regression or classification model. There is a neath `R` implementation in the [`lime`](https://lime.data-imaginist.com) package. If you want to investigate further, feel free! Otherwise, keep in mind this exists, we will come back to it again in later lectures.
 
 BTW: The original paper is mindblowing, if you find time, just read it!
 
-* Marco Tulio Ribeiro, Sameer Singh, and Carlos Guestrin. 2016. ""hy Should I Trust You?: Explaining the Predictions of Any Classifier." In Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD 2016). ACM, New York, NY, USA, 1135-1144. DOI: https://doi.org/10.1145/2939672.2939778
+-   Marco Tulio Ribeiro, Sameer Singh, and Carlos Guestrin. 2016. ""hy Should I Trust You?: Explaining the Predictions of Any Classifier." In Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD 2016). ACM, New York, NY, USA, 1135-1144. DOI: <https://doi.org/10.1145/2939672.2939778>
 
 ```{r}
 library(lime)
@@ -460,17 +450,15 @@ explanation %>% head()
 explanation %>% plot_features()
 ```
 
-
-
 # Bonus: Own predictions
 
-* We could also just apply the model to some own text and see how it predicts...
+-   We could also just apply the model to some own text and see how it predicts...
 
 ```{r}
 text_own = tibble(text = 'This device is going to save the world that includes a portion of solar photovoltaic power to control bio enriched energy saviung algae that produces a highly energy body state that can be used for mobile energy production.')
 ```
 
-* We run this text through our preprocessing recipe and let our model predict...
+-   We run this text through our preprocessing recipe and let our model predict...
 
 ```{r}
 fit_en %>% predict(new_data = data_recipe %>% bake(text_own))
@@ -494,26 +482,21 @@ text_cordis %>%
   head(50)
 ```
 
-
-
-
 # Endnotes
 
 ### References
 
-* [Hain, D., & Jurowetzki, R. (2020). Introduction to Rare-Event Predictive Modeling for Inferential Statisticians--A Hands-On Application in the Prediction of Breakthrough Patents. arXiv preprint arXiv:2003.13441.](https://arxiv.org/abs/2003.13441)
+-   [Hain, D., & Jurowetzki, R. (2020). Introduction to Rare-Event Predictive Modeling for Inferential Statisticians--A Hands-On Application in the Prediction of Breakthrough Patents. arXiv preprint arXiv:2003.13441.](https://arxiv.org/abs/2003.13441)
 
 ### Packages and Ecosystem
 
-* [`tidymodels`](https://www.tidymodels.org/): Tidy statistical and predictive modeling ecosystem
-* [`tidytext`](https://juliasilge.github.io/tidytext/): Tidy text analysis in R ecosystem
-* [`textrecipes`](https://textrecipes.tidymodels.org/): Preprocessing workflows for text data
-
-
+-   [`tidymodels`](https://www.tidymodels.org/): Tidy statistical and predictive modeling ecosystem
+-   [`tidytext`](https://juliasilge.github.io/tidytext/): Tidy text analysis in R ecosystem
+-   [`textrecipes`](https://textrecipes.tidymodels.org/): Preprocessing workflows for text data
 
 ### Further Readings
 
-* [`Tidy Text Mining in R`](https://www.tidytextmining.com/)
+-   [`Tidy Text Mining in R`](https://www.tidytextmining.com/)
 
 ### Session info
 
