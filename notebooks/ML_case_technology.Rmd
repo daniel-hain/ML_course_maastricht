@@ -477,8 +477,9 @@ pred_cordis <- tibble(pred = fit_en %>% predict(new_data = data_recipe %>% bake(
 ```{r}
 text_cordis %>%
   bind_cols(pred_cordis) %>%
+  filter(pred == 'TRUE') %>%
   arrange(desc(pred_prob)) %>%
-  select(projectAcronym, title, pred) %>%
+  select(projectAcronym, title, pred_prob) %>%
   head(50)
 ```
 
