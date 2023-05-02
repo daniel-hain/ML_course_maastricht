@@ -25,6 +25,10 @@ As part of the [AI:DK](https://aidenmark.dk/) project, he coordinates and leads 
 * [LinkedIn](https://www.linkedin.com/in/daniel-s-hain/)
 
 
+# Live Workshop
+
+ * A: Case study: Using NLP and ML to predict green patents 
+ [ ::> Html <::](https://daniel-hain.github.io/ML_course_maastricht/notebooks/ML_case_technology.nb.html)  
 
 # Lectures
 
@@ -33,6 +37,8 @@ Legend:
 * T: Theory lecture, explaining concepts without using to much code
 * A: Applications and demonstrations of concepts and techniques, mostly code-based
 * E: Execises for you to try your skills
+
+
 
 ## Introduction to Supervised Machine Learning (S-ML) in R
 
@@ -63,10 +69,7 @@ In this part you will be introduced to the fundamentals of analysing textual dat
  [ ::> Video 1 <:: ](https://www.loom.com/share/e9e054a738f3472983c905b1b739b9c3) 
  [ ::> Html <:: ](https://daniel-hain.github.io/ML_course_maastricht/notebooks/NLP_text_vectorization_R.nb.html)
 
-# Live Workshop
 
- * A: Case study: Using NLP and ML to predict green patents 
- [ ::> Html <::](https://daniel-hain.github.io/ML_course_maastricht/notebooks/ML_case_technology.nb.html)   
 
 
 # Further Resources
