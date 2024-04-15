@@ -1,4 +1,4 @@
-# Introduction to Machine Learning for Policy Analysis (Maastricht 2023)
+# Introduction to Machine Learning for Policy Analysis (Maastricht 2024)
 
 ## Welcome
 
