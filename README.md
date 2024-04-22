@@ -22,15 +22,16 @@ As part of the [AI:DK](https://aidenmark.dk/) project, he coordinates and leads 
 * [Github](https://github.com/daniel-hain)
 * [Google Scholar](https://scholar.google.dk/citations?user=7C8kR8EAAAAJ&hl=en&oi=ao)
 * [Twitter](https://twitter.com/Daniel_S_Hain)
-
-<!---
+* 
 # Live Workshop
 
  * A: Case study: Using NLP and ML to predict green patents 
  [ ::> Html <::](https://daniel-hain.github.io/ML_course_maastricht/notebooks/ML_case_technology.nb.html)  
-  [ ::> Video Recording <::](https://www.loom.com/share/477cf95f5a6646b58d40a58d17914b51)  
+<!---
+
+   [ ::> Video Recording <::](https://www.loom.com/share/477cf95f5a6646b58d40a58d17914b51) 
  --->
- 
+
 # Lectures
 
 Legend:
