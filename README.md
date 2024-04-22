@@ -22,7 +22,6 @@ As part of the [AI:DK](https://aidenmark.dk/) project, he coordinates and leads 
 * [Github](https://github.com/daniel-hain)
 * [Google Scholar](https://scholar.google.dk/citations?user=7C8kR8EAAAAJ&hl=en&oi=ao)
 * [Twitter](https://twitter.com/Daniel_S_Hain)
-* [LinkedIn](https://www.linkedin.com/in/daniel-s-hain/)
 
 <!---
 # Live Workshop
@@ -98,6 +97,7 @@ Find below a list of sfurther resources (including own material), either to brus
 
 ## Technology forecasting with ML & NLP
 
+*[Nechaev, I., & Hain, D. S. (2023). Social impacts reflected in CSR reports: Method of extraction and link to firms innovation capacity. Journal of Cleaner Production, 429, 139256.](https://doi.org/10.1016/j.jclepro.2023.139256)
 * [Hain, Daniel, et al. Hain, D. S., Jurowetzki, R., Buchmann, T., & Wolf, P. (2022). A text-embedding-based approach to measuring patent-to-patent technological similarity. Technological Forecasting and Social Change, 177, 121559.](https://doi.org/10.1016/j.techfore.2022.121559): Own paper, where we introduce to text embeddings and use it to map technology based on patent data.
 * [Bekamiri, H., Hain, D. S., & Jurowetzki, R. (2021). PatentSBERTa: A Deep NLP based Hybrid Model for Patent Distance and Classification using Augmented SBERT. arXiv preprint arXiv:2103.11933.](https://arxiv.org/pdf/2103.11933.pdf): More advanced version of the use of embeddings on. 
 * [Hain, Daniel, et al. Hain, D. S., Jurowetzki, R., Buchmann, T., & Wolf, P. (2022). A text-embedding-based approach to measuring patent-to-patent technological similarity. Technological Forecasting and Social Change, 177, 121559.](https://doi.org/10.1016/j.techfore.2022.121559): Own paper, where we introduce to text embeddings and use it to map technology based on patent data.patents.
