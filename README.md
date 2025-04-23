@@ -43,7 +43,6 @@ Legend:
 * E: Exercises for you to try your skills
 
 
-
 ## Introduction to Supervised Machine Learning (S-ML) in R
 
 This part will introduce you to the fundamentals of supervised machine learning (SML, aka. predictive modelling), and illustrate practical applications theeof in R. 
