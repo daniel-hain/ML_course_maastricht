@@ -1,4 +1,4 @@
-# Introduction to Machine Learning for Policy Analysis (Maastricht 2024)
+# Introduction to Machine Learning for Policy Analysis (Maastricht 2025)
 
 ## Welcome
 
@@ -12,7 +12,9 @@ To get the most out of this lectures, I expect you to have R & R-Studio installe
 
 ![](https://daniel-hain.github.io/media/me.jpg)
 
-Daniel is an Strategic Business Manager at NovoNordisk, where his team develops data driven methods and workflows to improve the performance of clinical trials. He is also an Associate Professor in Data Science & Innovation Economics at the Aalborg University Business School, where he was leading the Data Science research track at the [AI:Growth lab](https://www.business.aau.dk/research/ai-growth-lab/), and coordinated teaching at the [Social Data Science (SDS)](https://www.sds.aau.dk/) master specialization. His research is dedicated to the development and application of data-driven methods to map, understand, and predict technological change, and its causes and consequences for socioeconomic systems on various levels of aggregation. His current contextual focus is the dynamics of AI research and industry. 
+Daniel is an Strategic Business Manager at NovoNordisk, where his team develops data driven methods and workflows to improve the performance of clinical trials. This involves the use of machine learning to predict outcomes and costs of clinical trials, and natural language processing 
+
+He is also an Associate Professor in Data Science & Innovation Economics at the Aalborg University Business School, where he was leading the Data Science research track at the [AI:Growth lab](https://www.business.aau.dk/research/ai-growth-lab/), and coordinated teaching at the [Social Data Science (SDS)](https://www.sds.aau.dk/) master specialization. His research is dedicated to the development and application of data-driven methods to map, understand, and predict technological change, and its causes and consequences for socioeconomic systems on various levels of aggregation. His current contextual focus is the dynamics of AI research and industry. 
 
 His research is featured in leading academic journals such as Research Policy, but also attracted attention and funding from the industry, and lead to price-winning applications. Daniel is actively engaged in initiatives to educate (social science) students and researchers, professionals, and policymakers in understanding, evaluating, and applying modern Data Science and Artificial Intelligence methods for data-driven decision making. 
 
@@ -85,7 +87,6 @@ Find below a list of further resources (including own material), either to brush
 * [Nechaev, I., & Hain, D. S. (2023). Social impacts reflected in CSR reports: Method of extraction and link to firms innovation capacity. Journal of Cleaner Production, 429, 139256.](https://doi.org/10.1016/j.jclepro.2023.139256)
 * [Hain, Daniel, et al. Hain, D. S., Jurowetzki, R., Buchmann, T., & Wolf, P. (2022). A text-embedding-based approach to measuring patent-to-patent technological similarity. Technological Forecasting and Social Change, 177, 121559.](https://doi.org/10.1016/j.techfore.2022.121559): Own paper, where we introduce to text embeddings and use it to map technology based on patent data.
 * [Bekamiri, H., Hain, D. S., & Jurowetzki, R. (2021). PatentSBERTa: A Deep NLP based Hybrid Model for Patent Distance and Classification using Augmented SBERT. arXiv preprint arXiv:2103.11933.](https://arxiv.org/pdf/2103.11933.pdf): More advanced version of the use of embeddings on. 
-* [Hain, Daniel, et al. Hain, D. S., Jurowetzki, R., Buchmann, T., & Wolf, P. (2022). A text-embedding-based approach to measuring patent-to-patent technological similarity. Technological Forecasting and Social Change, 177, 121559.](https://doi.org/10.1016/j.techfore.2022.121559): Own paper, where we introduce to text embeddings and use it to map technology based on patent data.patents.
 * [Hain, D. S., Jurowetzki, R., Konda, P., & Oehler, L. (2020). From catching up to industrial leadership: towards an integrated market-technology perspective. An application of semantic patent-to-patent similarity in the wind and EV sector. Industrial and Corporate Change, 29(5), 1233-1255.](https://doi.org/10.1093/icc/dtaa021): Application of the technique.
 
 
