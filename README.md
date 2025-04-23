@@ -12,7 +12,7 @@ To get the most out of this lectures, I expect you to have R & R-Studio installe
 
 ![](https://daniel-hain.github.io/media/me.jpg)
 
-Daniel is an Strategic Business Manager at NovoNordisk, where his team develops data driven methods and workflows to improve the performance of clinical trials. This involves the use of machine learning to predict outcomes and costs of clinical trials, and natural language processing 
+Daniel is an Strategic Business Manager at NovoNordisk, where his team develops data driven methods and workflows to improve the performance of clinical trials. This involves the use of machine learning to predict outcomes and costs of clinical trials, and natural language processing to extract informations out of trial protocols.
 
 He is also an Associate Professor in Data Science & Innovation Economics at the Aalborg University Business School, where he was leading the Data Science research track at the [AI:Growth lab](https://www.business.aau.dk/research/ai-growth-lab/), and coordinated teaching at the [Social Data Science (SDS)](https://www.sds.aau.dk/) master specialization. His research is dedicated to the development and application of data-driven methods to map, understand, and predict technological change, and its causes and consequences for socioeconomic systems on various levels of aggregation. His current contextual focus is the dynamics of AI research and industry. 
 
