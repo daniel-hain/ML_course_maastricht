@@ -91,9 +91,9 @@ Find below a list of further resources (including own material), either to brush
 
 ## Data Science in R in general
 
-* [Wickham, H., & Grolemund, G. (2016). R for data science: import, tidy, transform, visualize, and model data. O'Reilly Media, Inc.](https://r4ds.had.co.nz/): The bible of modern data science in R. USe this to get started.
-* [Baumer, B., Kaplan, D. & Horton, N. (2020) Modern Data Science with R (2nd Ed.). CRC Press ](https://beanumber.github.io/mdsr2e/): Also nice supplementart book, also touching upon topics such as simulation and network analysis.
-* [Ismay & Kim (2020), Statistical Inference via Data Science: A ModernDive into R and the Tidyverse, CRC Press.](https://moderndive.com/): For those who want to first update their knowledge in basic and inferential statistics in a modern R setup.
+* [Wickham, H., & Grolemund, G. (2023). R for data science: import, tidy, transform, visualize, and model data. O'Reilly Media, Inc.](https://r4ds.hadley.nz/): The bible of modern data science in R. USe this to get started.
+* [Baumer, B., Kaplan, D. & Horton, N. (2023) Modern Data Science with R (2nd Ed.). CRC Press ](https://mdsr-book.github.io/mdsr3e/): Also nice supplementart book, also touching upon topics such as simulation and network analysis.
+* [Ismay & Kim (2024), Statistical Inference via Data Science: A ModernDive into R and the Tidyverse, CRC Press.](https://moderndive.com/v2/): For those who want to first update their knowledge in basic and inferential statistics in a modern R setup.
 
 ## Supervised Machine Learning
 
